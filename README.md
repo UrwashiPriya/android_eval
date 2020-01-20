@@ -1,2 +1,0 @@
-# neuman
-Neuman Android App
