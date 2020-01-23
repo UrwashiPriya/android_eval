@@ -20,7 +20,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DashActivity">
+        <activity android:name=".SplashActivity"></activity>
+        <activity android:name=".Assets">
+
         </activity>
     </application>
 

@@ -10,7 +10,6 @@ import com.google.gson.JsonObject;
 import com.neuman.brutus.Retrofit.Client;
 import com.neuman.brutus.Retrofit.models.SimpleResponse;
 
-import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Response;

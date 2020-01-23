@@ -55,6 +55,7 @@ public class Client {
 
         // config builder
         mBuilder.addInterceptor(logging).build();
+        mBuilder.addInterceptor(new CookieSetter(context));
         mBuilder.addInterceptor(new CookieGetter(context));
 
         // build

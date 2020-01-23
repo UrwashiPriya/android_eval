@@ -13,48 +13,49 @@ import android.widget.ProgressBar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.neuman.brutus.Utils.AccessControls;
 import com.neuman.brutus.Utils.Globals;
+import com.neuman.brutus.adapter.Asset;
 
 import java.util.HashSet;
 
 public class LoginActivity extends AppCompatActivity {
 
-    Globals g;
+    Globals g = new Globals();
     Intent intent;
     AccessControls access;
     ProgressDialog dialog;
     String username, password;
-    TextInputEditText user_input = findViewById(R.id.username), pass_input = findViewById(R.id.password);
+    TextInputEditText user_input, pass_input;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
-        g = new Globals();
         access = new AccessControls(getApplicationContext());
         dialog = g.progressDialog(this, false);
-        ProgressBar progress = findViewById(R.id.progress_bar_);
-        progress.setVisibility(View.VISIBLE);
+        intent = new Intent(LoginActivity.this, Assets.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        username = prefs.getString("username", null);
-        password = prefs.getString("password", null);
+        // Check if User Credentials are stored in Local
+        auto_login_if_returning(access, dialog);
 
-        if (username != null && password != null) {
-            intent = new Intent(LoginActivity.this, DashActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        setContentView(R.layout.activity_login);
 
-            access.validate_user(username, password, g.save_creds, getApplicationContext(), intent, dialog);
-        }
+        user_input = findViewById(R.id.username);
+        pass_input = findViewById(R.id.password);
 
         findViewById(R.id.login_button).setOnClickListener(v -> {
             username = user_input.getText().toString();
             password = pass_input.getText().toString();
 
-            intent = new Intent(LoginActivity.this, DashActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
             access.validate_user(username, password, g.save_creds, getApplicationContext(), intent, dialog);
         });
+    }
+
+    private void auto_login_if_returning(AccessControls access, ProgressDialog dialog) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        if (prefs.getString("username", null) != null && prefs.getString("password", null) != null) {
+            access.validate_user(prefs.getString("username", null),  prefs.getString("password", null), g.save_creds, getApplicationContext(), intent, dialog);
+        }
     }
 }

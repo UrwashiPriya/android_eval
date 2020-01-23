@@ -20,6 +20,7 @@ public class CookieSetter implements Interceptor {
 
     public CookieSetter(Context context) {
         this.context = context;
+        g = new Globals();
     }
 
     @Override
@@ -31,6 +32,8 @@ public class CookieSetter implements Interceptor {
         for (String cookie : preferences) {
             builder.addHeader("Cookie", cookie);
         }
+
+        System.out.println("NLNLNLNLNLNL");
 
         return chain.proceed(builder.build());
     }

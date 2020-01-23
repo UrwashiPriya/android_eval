@@ -5,10 +5,6 @@ import android.content.Context;
 
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.DoubleBounce;
-import com.neuman.brutus.R;
-
-import java.sql.Array;
-import java.util.List;
 
 public class Globals {
 

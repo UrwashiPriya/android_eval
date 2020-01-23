@@ -1,6 +1,7 @@
 package com.neuman.brutus.Retrofit;
 
 import com.google.gson.JsonObject;
+import com.neuman.brutus.Retrofit.models.RomaResponse;
 import com.neuman.brutus.Retrofit.models.SimpleResponse;
 
 import okhttp3.ResponseBody;
@@ -12,4 +13,7 @@ public interface Interface {
 
     @POST("people/login")
     Call<SimpleResponse> user_login(@Body JsonObject user_creds);
+
+    @POST("roma/fetch")
+    Call<RomaResponse> roma_fetch(@Body JsonObject roma_search);
 }
