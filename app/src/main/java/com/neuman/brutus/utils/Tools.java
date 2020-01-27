@@ -1,4 +1,4 @@
-package com.neuman.brutus.Utils;
+package com.neuman.brutus.utils;
 
 import android.app.Activity;
 import android.content.Context;

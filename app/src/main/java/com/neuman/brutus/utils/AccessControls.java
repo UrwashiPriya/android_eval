@@ -1,4 +1,4 @@
-package com.neuman.brutus.Utils;
+package com.neuman.brutus.utils;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -7,8 +7,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.google.gson.JsonObject;
-import com.neuman.brutus.Retrofit.Client;
-import com.neuman.brutus.Retrofit.models.SimpleResponse;
+import com.neuman.brutus.retrofit.Client;
+import com.neuman.brutus.retrofit.models.SimpleResponse;
 
 
 import retrofit2.Call;

@@ -1,4 +1,4 @@
-package com.neuman.brutus.Retrofit;
+package com.neuman.brutus.retrofit;
 
 import android.util.Log;
 

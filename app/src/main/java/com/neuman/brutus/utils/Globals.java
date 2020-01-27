@@ -1,10 +1,14 @@
-package com.neuman.brutus.Utils;
+package com.neuman.brutus.utils;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 
+import androidx.fragment.app.Fragment;
+
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.DoubleBounce;
+
+import java.util.HashMap;
 
 public class Globals {
 
@@ -24,3 +28,4 @@ public class Globals {
         return prog_dialog;
     }
 }
+

@@ -1,10 +1,9 @@
-package com.neuman.brutus.Retrofit;
+package com.neuman.brutus.retrofit;
 
 import com.google.gson.JsonObject;
-import com.neuman.brutus.Retrofit.models.RomaResponse;
-import com.neuman.brutus.Retrofit.models.SimpleResponse;
+import com.neuman.brutus.retrofit.models.RomaResponse;
+import com.neuman.brutus.retrofit.models.SimpleResponse;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;

@@ -1,4 +1,4 @@
-package com.neuman.brutus.Retrofit.models;
+package com.neuman.brutus.retrofit.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

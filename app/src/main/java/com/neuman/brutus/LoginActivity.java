@@ -7,15 +7,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.View;
-import android.widget.ProgressBar;
 
 import com.google.android.material.textfield.TextInputEditText;
-import com.neuman.brutus.Utils.AccessControls;
-import com.neuman.brutus.Utils.Globals;
-import com.neuman.brutus.adapter.Asset;
-
-import java.util.HashSet;
+import com.neuman.brutus.utils.AccessControls;
+import com.neuman.brutus.utils.Globals;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -32,7 +27,9 @@ public class LoginActivity extends AppCompatActivity {
 
         access = new AccessControls(getApplicationContext());
         dialog = g.progressDialog(this, false);
-        intent = new Intent(LoginActivity.this, Assets.class);
+
+        // If user valid? Go Home
+        intent = new Intent(LoginActivity.this, Home.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         // Check if User Credentials are stored in Local

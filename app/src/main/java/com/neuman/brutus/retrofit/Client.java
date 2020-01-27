@@ -1,8 +1,8 @@
-package com.neuman.brutus.Retrofit;
+package com.neuman.brutus.retrofit;
 
 import android.content.Context;
 
-import com.neuman.brutus.Utils.Globals;
+import com.neuman.brutus.utils.Globals;
 
 import java.util.concurrent.TimeUnit;
 
@@ -41,24 +41,24 @@ public class Client {
     }
 
     private static OkHttpClient getOkHttpClient(HttpLoggingInterceptor.Logger logger) {
-        OkHttpClient.Builder mBuilder = new OkHttpClient.Builder();
+        OkHttpClient.Builder okhttp_builder = new OkHttpClient.Builder();
 
         // set conn timeout & read timeout
-        mBuilder.connectTimeout(2000, TimeUnit.SECONDS);
-        mBuilder.readTimeout(3000, TimeUnit.SECONDS);
+        okhttp_builder.connectTimeout(2000, TimeUnit.SECONDS);
+        okhttp_builder.readTimeout(3000, TimeUnit.SECONDS);
 
         // add logging for all requests in our debug builds
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger);
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        mBuilder.cache(null);
+        okhttp_builder.cache(null);
 
         // config builder
-        mBuilder.addInterceptor(logging).build();
-        mBuilder.addInterceptor(new CookieSetter(context));
-        mBuilder.addInterceptor(new CookieGetter(context));
+        okhttp_builder.addInterceptor(logging).build();
+        okhttp_builder.addInterceptor(new CookieSetter(context));
+        okhttp_builder.addInterceptor(new CookieGetter(context));
 
         // build
-        return mBuilder.build();
+        return okhttp_builder.build();
     }
 }

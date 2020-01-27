@@ -1,4 +1,4 @@
-package com.neuman.brutus.Retrofit.models;
+package com.neuman.brutus.retrofit.models;
 
 public class RomaFilters {
     Integer id;

@@ -1,10 +1,10 @@
-package com.neuman.brutus.Retrofit;
+package com.neuman.brutus.retrofit;
 
 
 import android.content.Context;
 import android.preference.PreferenceManager;
 
-import com.neuman.brutus.Utils.Globals;
+import com.neuman.brutus.utils.Globals;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -32,8 +32,6 @@ public class CookieSetter implements Interceptor {
         for (String cookie : preferences) {
             builder.addHeader("Cookie", cookie);
         }
-
-        System.out.println("NLNLNLNLNLNL");
 
         return chain.proceed(builder.build());
     }
