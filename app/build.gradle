@@ -26,6 +26,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+    }
 }
 
 /* IMPORTANT :
@@ -53,4 +57,8 @@ dependencies {
     }
 
     implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation 'com.wdullaer:materialdatetimepicker:3.2.0'
+    implementation 'com.hootsuite.android:nachos:1.1.1'
+    implementation 'pub.devrel:easypermissions:0.2.1'
+    implementation 'id.zelory:compressor:2.1.0'
 }

@@ -18,20 +18,20 @@
             app:contentInsetStartWithNavigation="0dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:theme="@style/Toolbar.Light"
-            app:title="Tickets">
+            app:title="Supplies">
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:theme="@style/Button.Primary"
-                android:text="+ Tickets"/>
+                android:text="+ Supplies"/>
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <ListView
-        android:id="@+id/ticket_list"
+        android:id="@+id/supply_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

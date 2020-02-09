@@ -13,6 +13,12 @@ import com.neuman.brutus.R;
 
 public class HomeFragment extends Fragment {
 
+    public HomeFragment() {
+        Bundle bundle = new Bundle();
+        bundle.putString("name", "Home");
+        this.setArguments(bundle);
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 

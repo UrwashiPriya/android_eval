@@ -3,7 +3,9 @@ package com.neuman.brutus.retrofit.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Enums {
+import java.io.Serializable;
+
+public class Enums implements Serializable {
     @Expose
     @SerializedName("id")
     Integer id;
@@ -15,4 +17,8 @@ public class Enums {
     @Expose
     @SerializedName("format")
     String format;
+
+    public Integer getId() { return id; }
+
+    public String getValue() { return value; }
 }

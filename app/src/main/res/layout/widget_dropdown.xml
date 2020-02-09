@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EditText android:id="@+id/dropdown_lay"
+    style="@style/EditText.Flat.Grey"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/spacing_xmlarge"
+    android:layout_marginTop="@dimen/spacing_mlarge"
+    android:background="@drawable/edit_text_round_bg_outline"
+    android:drawableEnd="@drawable/ic_arrow_drop"
+    android:drawableRight="@drawable/ic_arrow_drop"
+    android:focusable="false"
+    android:minHeight="@dimen/spacing_xmlarge"
+    android:paddingLeft="@dimen/spacing_middle"
+    android:paddingRight="@dimen/spacing_middle"
+    android:text="Attribute"
+    android:textColor="@android:color/white"
+    xmlns:android="http://schemas.android.com/apk/res/android" />

@@ -3,9 +3,13 @@ package com.neuman.brutus.retrofit.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
+import org.w3c.dom.Attr;
 
-public class Roma {
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+public class Roma implements Serializable {
     @Expose
     @SerializedName("id")
     Integer id;
@@ -55,4 +59,16 @@ public class Roma {
     ArrayList<Clusters> clusters;
 
     public String getCode() { return code; }
+
+    public Integer getAdded_by() { return added_by; }
+
+    public String getAttribute(String attribute) {
+
+        Iterator<Attributes> i = attributes.iterator();
+
+        while (i.hasNext()) {
+            Attributes nxt = i.next(); if(nxt.getName().equals(attribute)) { return nxt.getAttr_data_value()==null? nxt.getRaw_data() : nxt.getAttr_data_value(); }
+        }
+        return "";
+    }
 }

@@ -14,19 +14,18 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.neuman.brutus.R;
-import com.neuman.brutus.adapters.AssetListAdapter;
-import com.neuman.brutus.adapters.OrganisationListAdapter;
+import com.neuman.brutus.adapters.SupplyListAdapter;
 import com.neuman.brutus.retrofit.models.RomaResponse;
 import com.neuman.brutus.utils.Tools;
 
-public class OrgFragment extends Fragment {
+public class SupplyFragment extends Fragment {
 
     ListView listView;
     ListAdapter listAdapter;
 
-    public OrgFragment() {
+    public SupplyFragment() {
         Bundle bundle = new Bundle();
-        bundle.putString("name", "Account");
+        bundle.putString("name", "Supplies");
         this.setArguments(bundle);
     }
 
@@ -34,8 +33,8 @@ public class OrgFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_org, container, false);
-        listView = view.findViewById(R.id.organisation_list);
+        View view = inflater.inflate(R.layout.fragment_supplies, container, false);
+        listView = view.findViewById(R.id.supply_list);
 
         return view;
     }
@@ -50,16 +49,16 @@ public class OrgFragment extends Fragment {
         try {
             romaResponse = (RomaResponse) bundle.getSerializable("response");
         } catch (NullPointerException n) {
-            Log.d("NPE", n.getMessage());
+            Log.d("NPE Ticket", n.getMessage());
         }
 
         if (romaResponse!=null && !romaResponse.getRoma().toString().equals("false") && !romaResponse.getRoma().isEmpty()) {
 
-            listAdapter = new OrganisationListAdapter(getActivity(), romaResponse.getCodeList(), romaResponse.getEqTypeList(), romaResponse.getImageList());
+            listAdapter = new SupplyListAdapter(getActivity(), romaResponse.getCodeList(), romaResponse.getEqTypeList(), romaResponse.getImageList());
 
             listView.setAdapter(listAdapter);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                System.out.println("Touch");
+                System.out.println("Touch" + position);
             });
         }
 

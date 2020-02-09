@@ -12,13 +12,6 @@
         android:orientation="vertical"
         android:id="@+id/frag_container">
 
-        <ProgressBar
-            android:id="@+id/progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:indeterminate="true" />
-
 
     </LinearLayout>
 
@@ -64,7 +57,7 @@
                 android:clickable="true"
                 android:padding="@dimen/spacing_smlarge"
                 android:tint="@color/quantum_black_100"
-                app:srcCompat="@drawable/ic_event_seat" />
+                app:srcCompat="@drawable/ic_widgets" />
 
 
 
@@ -81,7 +74,7 @@
                 android:clickable="true"
                 android:padding="@dimen/spacing_smlarge"
                 android:tint="@color/quantum_black_100"
-                app:srcCompat="@drawable/ic_notifications" />
+                app:srcCompat="@drawable/ic_book" />
 
             <View
                 android:layout_width="0dp"
@@ -96,7 +89,7 @@
                 android:clickable="true"
                 android:padding="@dimen/spacing_smlarge"
                 android:tint="@color/quantum_black_100"
-                app:srcCompat="@drawable/ic_shopping_cart" />
+                app:srcCompat="@drawable/ic_business" />
 
             <View
                 android:layout_width="0dp"
@@ -111,7 +104,7 @@
                 android:clickable="true"
                 android:padding="@dimen/spacing_smlarge"
                 android:tint="@color/quantum_black_100"
-                app:srcCompat="@drawable/ic_bluetooth" />
+                app:srcCompat="@drawable/ic_widgets" />
 
             <View
                 android:layout_width="0dp"

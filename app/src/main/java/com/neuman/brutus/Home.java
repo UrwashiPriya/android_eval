@@ -7,39 +7,33 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.github.ybq.android.spinkit.sprite.Sprite;
-import com.github.ybq.android.spinkit.style.DoubleBounce;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.neuman.brutus.fragments.AssetFragment;
 import com.neuman.brutus.fragments.HomeFragment;
 import com.neuman.brutus.fragments.OrgFragment;
-import com.neuman.brutus.fragments.SpareFragment;
+import com.neuman.brutus.fragments.SupplyFragment;
 import com.neuman.brutus.fragments.TicketFragment;
-import com.neuman.brutus.retrofit.models.RomaResponse;
-import com.neuman.brutus.utils.FragManager;
-
-import org.json.JSONException;
+import com.neuman.brutus.fragments.FragManager;
 
 import java.util.HashMap;
 
 public class Home extends AppCompatActivity implements View.OnClickListener{
 
     FloatingActionButton fab;
-    FragManager fragManager;
+    public FragManager fragManager;
     ProgressBar spinner = null;
-    FragmentManager fr_man = getSupportFragmentManager();
+    public FragmentManager fr_man = getSupportFragmentManager();
 
     HashMap<Integer, Fragment> fragmentHashMap = new HashMap<>();
 
-    Fragment cur;
+    public Fragment cur;
 
     final Fragment fr_home = new HomeFragment();
     final Fragment fr_assets = new AssetFragment();
     final Fragment fr_tickets = new TicketFragment();
     final Fragment fr_org = new OrgFragment();
-    final Fragment fr_spares = new SpareFragment();
+    final Fragment fr_spares = new SupplyFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,15 +49,15 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
         fab = findViewById(R.id.fab_btn);
 
         fragManager = new FragManager(fragmentHashMap, fr_man, fab,this, this, fr_home);
-
+        fr_man.beginTransaction().show(fr_home).commit();
         cur = fr_home;
     }
 
     @Override
     public void onClick(View v) {
+        System.out.println("kokoko");
         Fragment next = fragmentHashMap.get(v.getId());
-
-        if (next != cur) {
+        if (next!=cur && next!=null) {
             fragManager.transition(cur, next, spinner);
             cur = next;
         }
