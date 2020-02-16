@@ -24,7 +24,7 @@ public class AssetFragment extends Fragment {
     ListView listView;
     ListAdapter listAdapter;
     RomaResponse romaResponse;
-    AssetView asset;
+    AssetViewEdit asset;
     RomaOps romaOps;
 
     public AssetFragment() {
@@ -39,13 +39,12 @@ public class AssetFragment extends Fragment {
 
         View view_ = inflater.inflate(R.layout.fragment_assets, container, false);
         listView = view_.findViewById(R.id.asset_list);
-        CreateRoma addRoma = new CreateRoma();
+        AddRoma addRoma = new AddRoma();
         Home homme = (Home) getActivity();
 
         Button btn = view_.findViewById(R.id.add_button);
         btn.setOnClickListener(v -> {
-            romaOps.fetch_roma_mod_attrs("1", "1", "0", "100", homme.cur, addRoma, homme.fr_man);
-            homme.cur = addRoma;
+            romaOps.fetch_roma_mod_attrs("1", "1", "0", "100", homme.cur, addRoma, homme.fr_man, homme);
         });
 
         return view_;
@@ -67,14 +66,14 @@ public class AssetFragment extends Fragment {
 
             listView.setOnItemClickListener((parent, view, position, id) -> {
 
-                Bundle view_bundle = new Bundle();
-                view_bundle.putSerializable("asset", romaResponse.getRoma().get(position));
-                asset = new AssetView();
-                asset.setArguments(view_bundle);
-
                 Home homme = (Home) getActivity();
-                homme.fr_man.beginTransaction().add(R.id.frag_container, asset, "asset").hide(homme.cur).show(asset).commit();
-                homme.cur = asset;
+                Bundle view_bundle = new Bundle();
+                AssetViewEdit viewedit_roma = new AssetViewEdit();
+
+                view_bundle.putSerializable("asset", romaResponse.getRoma().get(position));
+                viewedit_roma.setArguments(view_bundle);
+
+                romaOps.view_roma("1", "1", "0", "100", homme.cur, viewedit_roma, homme.fr_man, homme);
             });
         }
 

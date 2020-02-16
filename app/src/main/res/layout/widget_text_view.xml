@@ -11,6 +11,6 @@
         android:paddingTop="@dimen/spacing_large"
         android:paddingBottom="@dimen/spacing_middle"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:textColor="@color/overlay_light_60" />
+        android:textColor="@color/quantum_white_100" />
 
 </LinearLayout>

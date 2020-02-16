@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.provider.MediaStore;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.neuman.brutus.retrofit.Client;
 import com.neuman.brutus.retrofit.models.UploadResponse;
 
@@ -20,10 +22,10 @@ import okhttp3.RequestBody;
 
 public class ImageOps {
 
-    public void upload_images(Context context, JsonArray image_attributes) {
+    public JsonArray upload_images(Context context, JsonArray image_attributes, JsonArray attribute_list) {
         for (int i=0; i<image_attributes.size(); i++) {
 
-            System.out.println("Uploading..."+i);
+            System.out.println("Uploading... "+image_attributes.get(i).getAsJsonObject().get("value").getAsString());
 
             File file = new File(image_attributes.get(i).getAsJsonObject().get("value").getAsString());
             RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
@@ -32,6 +34,15 @@ public class ImageOps {
             try {
                 UploadResponse response = Client.getService(context).upload_file(body, "1").execute().body();
                 image_attributes.get(i).getAsJsonObject().addProperty("value", response.getFile());
+
+                for (JsonElement jsonElement: attribute_list) {
+                    if (jsonElement.getAsJsonObject().get("id").equals(image_attributes.get(i).getAsJsonObject().get("id"))) {
+                        attribute_list.remove(jsonElement);
+                    }
+                }
+
+                attribute_list.add(image_attributes.get(i));
+                image_attributes.remove(i);
 
 //                .enqueue(new Callback<UploadResponse>() {
 //                    @Override
@@ -48,7 +59,7 @@ public class ImageOps {
                 e.printStackTrace();
             }
         }
-
+        return attribute_list;
     }
 
     public Bitmap decodeFile(String path) {

@@ -8,6 +8,7 @@ import org.w3c.dom.Attr;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class Roma implements Serializable {
     @Expose
@@ -70,5 +71,19 @@ public class Roma implements Serializable {
             Attributes nxt = i.next(); if(nxt.getName().equals(attribute)) { return nxt.getAttr_data_value()==null? nxt.getRaw_data() : nxt.getAttr_data_value(); }
         }
         return "";
+    }
+
+    public List<String> getClustersAsList() {
+        List<String> cluster_val = new ArrayList<>();
+
+        for (Clusters clu: clusters) {
+            cluster_val.add(clu.getCluster());
+        }
+
+        return cluster_val;
+    }
+
+    public ArrayList<Attributes> getAttributes() {
+        return attributes;
     }
 }

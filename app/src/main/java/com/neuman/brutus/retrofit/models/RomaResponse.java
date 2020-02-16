@@ -52,7 +52,7 @@ public class RomaResponse implements Serializable {
         Iterator<Roma> i = roma.iterator();
 
         while(i.hasNext()) {
-            images.add(i.next().getAttribute("Equipment Image"));
+            images.add("http://heyneuman.com:3000/uploads/1/"+i.next().getAttribute("Equipment Image"));
         }
 
         return images;

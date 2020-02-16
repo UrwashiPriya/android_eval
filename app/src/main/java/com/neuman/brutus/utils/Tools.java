@@ -55,7 +55,6 @@ public class Tools {
                     img.setImageDrawable(circularBitmapDrawable);
                 }
             });
-        } catch (Exception e) {
-        }
+        } catch (Exception e) { }
     }
 }

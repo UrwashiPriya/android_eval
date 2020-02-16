@@ -12,5 +12,6 @@
     android:paddingLeft="@dimen/spacing_middle"
     android:paddingRight="@dimen/spacing_middle"
     android:text="Attribute"
-    android:textColor="@android:color/white"
+    android:textColor="@color/mdtp_white"
+    android:textColorHint="@color/overlay_light_40"
     xmlns:android="http://schemas.android.com/apk/res/android" />

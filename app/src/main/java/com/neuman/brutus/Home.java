@@ -2,6 +2,7 @@ package com.neuman.brutus;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,52 +15,38 @@ import com.neuman.brutus.fragments.HomeFragment;
 import com.neuman.brutus.fragments.OrgFragment;
 import com.neuman.brutus.fragments.SupplyFragment;
 import com.neuman.brutus.fragments.TicketFragment;
-import com.neuman.brutus.fragments.FragManager;
+import com.neuman.brutus.utils.Globals;
 
 import java.util.HashMap;
 
 public class Home extends AppCompatActivity implements View.OnClickListener{
 
-    FloatingActionButton fab;
-    public FragManager fragManager;
-    ProgressBar spinner = null;
+    public FragmentHandler fragManager;
     public FragmentManager fr_man = getSupportFragmentManager();
+    ProgressBar spinner = null;
+    Globals g = new Globals();
 
-    HashMap<Integer, Fragment> fragmentHashMap = new HashMap<>();
-
-    public Fragment cur;
-
-    final Fragment fr_home = new HomeFragment();
-    final Fragment fr_assets = new AssetFragment();
-    final Fragment fr_tickets = new TicketFragment();
-    final Fragment fr_org = new OrgFragment();
-    final Fragment fr_spares = new SupplyFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
 
-        fragmentHashMap.put(R.id.menu_nav_1, fr_home);
-        fragmentHashMap.put(R.id.menu_nav_2, fr_assets);
-        fragmentHashMap.put(R.id.menu_nav_3, fr_tickets);
-        fragmentHashMap.put(R.id.menu_nav_4, fr_org);
-        fragmentHashMap.put(R.id.menu_nav_5, fr_spares);
+        fragManager = new FragmentHandler(g.fragments, fr_man,this, this, g);
+        fr_man.beginTransaction().show(g.fr_home).commit();
+        g.cur = g.fr_home;
 
-        fab = findViewById(R.id.fab_btn);
-
-        fragManager = new FragManager(fragmentHashMap, fr_man, fab,this, this, fr_home);
-        fr_man.beginTransaction().show(fr_home).commit();
-        cur = fr_home;
+        ImageView iv = findViewById(R.id.menu_nav_1);
+        iv.setOnClickListener(this);
+        getSupportFragmentManager().beginTransaction().add(R.id.frag_container, g.fr_home, "home").commit();
     }
 
     @Override
     public void onClick(View v) {
-        System.out.println("kokoko");
-        Fragment next = fragmentHashMap.get(v.getId());
-        if (next!=cur && next!=null) {
-            fragManager.transition(cur, next, spinner);
-            cur = next;
+        String next = v.getTag().toString();
+        if (next!=g.cur && next!=null) {
+            fragManager.transition(g.cur, next, spinner);
+            g.cur = next;
         }
     }
 }

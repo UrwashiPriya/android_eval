@@ -8,6 +8,4 @@
     android:textColorHint="@color/overlay_light_40"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <requestFocus />
-
 </com.hootsuite.nachos.NachoTextView>
