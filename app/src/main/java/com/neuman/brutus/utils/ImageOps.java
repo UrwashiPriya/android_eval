@@ -24,9 +24,7 @@ public class ImageOps {
 
     public JsonArray upload_images(Context context, JsonArray image_attributes, JsonArray attribute_list) {
         for (int i=0; i<image_attributes.size(); i++) {
-
-            System.out.println("Uploading... "+image_attributes.get(i).getAsJsonObject().get("value").getAsString());
-
+            
             File file = new File(image_attributes.get(i).getAsJsonObject().get("value").getAsString());
             RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
             MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
