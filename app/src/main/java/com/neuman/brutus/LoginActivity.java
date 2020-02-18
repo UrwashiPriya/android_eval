@@ -14,7 +14,7 @@ import com.neuman.brutus.utils.Globals;
 
 public class LoginActivity extends AppCompatActivity {
 
-    Globals g = new Globals();
+    Globals g;
     Intent intent;
     AccessControls access;
     ProgressDialog dialog;
@@ -24,6 +24,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        g = new Globals();
 
         access = new AccessControls(getApplicationContext());
         dialog = g.progressDialog(this, false);

@@ -2,6 +2,7 @@ package com.neuman.brutus.retrofit;
 
 import android.content.Context;
 
+import com.neuman.brutus.Home;
 import com.neuman.brutus.utils.Globals;
 
 import java.util.concurrent.TimeUnit;
@@ -17,7 +18,7 @@ public class Client {
     private static Context context;
     private static Client client;
     private Interface interface_;
-    private Globals g = new Globals();
+    private Globals g;
 
     public static Interface getService(Context context) {
         if (client == null) {
@@ -29,6 +30,7 @@ public class Client {
 
     private Client(Context context) {
         this.context = context;
+        g = new Globals();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(g.API_BASE)

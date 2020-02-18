@@ -68,7 +68,7 @@ public class RomaOps {
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().add(R.id.frag_container, nxt, "add_roma").hide(cur).show(nxt);
                 fragmentTransaction.commit();
 
-                homme.cur = nxt;
+//                homme.cur = nxt;
             }
 
             @Override
@@ -100,7 +100,7 @@ public class RomaOps {
 
                 if (progressBar != null) { progressBar.setVisibility(View.INVISIBLE); }
                 fragmentManager.beginTransaction().hide(cur).show(nxt).commit();
-                homme.cur = nxt;
+//                homme.cur = nxt;
             }
 
             @Override
@@ -142,7 +142,7 @@ public class RomaOps {
                             FragmentTransaction fragmentTransaction = fragmentManager.findFragmentByTag("add_roma")==null?fragmentManager.beginTransaction().add(R.id.frag_container, nxt, "add_roma").hide(cur).show(nxt):fragmentManager.beginTransaction().hide(cur).show(nxt);
                             fragmentTransaction.commit();
 
-                            homme.cur = nxt;
+//                            homme.cur = nxt;
                         }
 
                         @Override
@@ -173,7 +173,7 @@ public class RomaOps {
                         @Override
                         public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
                             if(response.body()!=null && response.body().getSuccess().equals("true")) {
-                                homme.fragManager.transition(homme.cur, assets, null);
+//                                homme.fragManager.transition(homme.cur, assets, null);
                             }
                         }
 
@@ -192,7 +192,7 @@ public class RomaOps {
                     @Override
                     public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
                         if(response.body()!=null && response.body().getSuccess().equals("true")) {
-                            homme.fragManager.transition(homme.cur, assets, null);
+//                            homme.fragManager.transition(homme.cur, assets, null);
                         }
                     }
 
@@ -219,7 +219,7 @@ public class RomaOps {
                         @Override
                         public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
                             if(response.body()!=null && response.body().getSuccess().equals("true")) {
-                                homme.fragManager.transition(homme.cur, assets, null);
+//                                homme.fragManager.transition(homme.cur, assets, null);
                             }
                         }
 
@@ -238,7 +238,7 @@ public class RomaOps {
                     @Override
                     public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
                         if(response.body()!=null && response.body().getSuccess().equals("true")) {
-                            homme.fragManager.transition(homme.cur, assets, null);
+//                            homme.fragManager.transition(homme.cur, assets, null);
                         }
                     }
 

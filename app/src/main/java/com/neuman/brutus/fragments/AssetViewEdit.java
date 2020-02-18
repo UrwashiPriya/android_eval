@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -40,9 +41,13 @@ import com.hootsuite.nachos.terminator.ChipTerminatorHandler;
 import com.neuman.brutus.Home;
 import com.neuman.brutus.R;
 import com.neuman.brutus.adapters.ArrayAdapter;
+import com.neuman.brutus.retrofit.Client;
+import com.neuman.brutus.retrofit.models.AttributeReponse;
 import com.neuman.brutus.retrofit.models.Attributes;
+import com.neuman.brutus.retrofit.models.ClusterResponse;
 import com.neuman.brutus.retrofit.models.Clusters;
 import com.neuman.brutus.retrofit.models.Roma;
+import com.neuman.brutus.retrofit.models.SimpleResponse;
 import com.neuman.brutus.utils.DialogUtils;
 import com.neuman.brutus.utils.Globals;
 import com.neuman.brutus.utils.ImageOps;
@@ -60,6 +65,9 @@ import java.util.Date;
 
 import id.zelory.compressor.Compressor;
 import pub.devrel.easypermissions.EasyPermissions;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -81,8 +89,9 @@ public class AssetViewEdit extends Fragment {
     private String last_captured_image_path;
     private View current_view;
     private View v;
-    private Globals utils = new Globals();
+    private Globals utils;
     private RomaOps romaOps;
+    private Home homme;
     private EditText editText;
     private String[] galleryPermissions = { Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA };
 
@@ -92,20 +101,49 @@ public class AssetViewEdit extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.view_assets, container, false);
         romaOps = new RomaOps(getActivity());
+        utils  = new Globals();
+        homme = (Home) getActivity();
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
 
-        try { roma = (Roma) getArguments().getSerializable("asset"); romaOps.existing_clusters = (ArrayList<Clusters>) getArguments().getSerializable("clusters"); } catch (NullPointerException n) { Log.d("NPE", n.getMessage()); }
+    @Nullable
+    @Override
+    public Object getEnterTransition() {
+
+        try { roma = (Roma) getArguments().getSerializable("asset"); } catch (NullPointerException n) { Log.d("NPE", n.getMessage()); }
+
+        JsonObject tag_params = new JsonObject();
+        tag_params.addProperty("offset", "0");
+        tag_params.addProperty("limit", "10");
+        tag_params.addProperty("account", "1");
+
+        Client.getService(getActivity()).account_cluster_fetch(tag_params).enqueue(new retrofit2.Callback<ClusterResponse>() {
+
+            @Override
+            public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
+                romaOps.existing_clusters = response.body().getClusters();
+                make_view(getView());
+            }
+
+            @Override
+            public void onFailure(Call<ClusterResponse> call, Throwable t) { }
+        });
+
+        return super.getEnterTransition();
+    }
+
+    private void make_view(View view) {
 
         if (roma != null && !roma.toString().equals("false")) {
-
             asset_layout = view.findViewById(R.id.asset_layout);
             ((ImageButton) view.findViewById(R.id.enable_edit_button_roma)).setOnClickListener(vee->edit_roma(vee, view));
             ((ImageButton) view.findViewById(R.id.apply_edit_button_roma)).setOnClickListener(vee->edit_roma(vee, view));
+            ((ImageButton) view.findViewById(R.id.bt_close)).setOnClickListener(vee->homme.fragmentHandler.transition("ASSETS"));
 
             ((TextView) view.findViewById(R.id.view_code)).setText(roma.getCode());
 
@@ -114,7 +152,7 @@ public class AssetViewEdit extends Fragment {
             asset_layout.addView(dialogs.makeTextView("Clusters", getLayoutInflater()));
 
             String[] cluster_suggestions = new String[romaOps.existing_clusters.size()];
-            for (int m = 0; m<romaOps.existing_clusters.size(); m++) { cluster_suggestions[m] = romaOps.existing_clusters.get(m).getCluster(); }
+            for (int m = 0; m < romaOps.existing_clusters.size(); m++) { cluster_suggestions[m] = romaOps.existing_clusters.get(m).getCluster(); }
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, cluster_suggestions);
 
             v = getLayoutInflater().inflate(R.layout.widget_chips, null);
@@ -127,8 +165,8 @@ public class AssetViewEdit extends Fragment {
             nachoTextView.setTag("clusters");
             nachoTextView.setHint("Hit Return to Add a Tag");
             nachoTextView.setOnFocusChangeListener((vee, hasFocus) -> nachoTextView.chipifyAllUnterminatedTokens());
-            nachoTextView.setFocusable(false);
 
+            v.setEnabled(false);
             asset_layout.addView(v);
 
             utils.roma_attributes = roma.getAttributes();
@@ -298,7 +336,6 @@ public class AssetViewEdit extends Fragment {
             add_cluster_request.addProperty("account", "1");
             add_cluster_request.add("cluster", new JsonParser().parse(new_clusters.toString()));
 
-            Home homme = (Home) getActivity();
             Bundle bundle = new Bundle();
             AssetFragment assets = new AssetFragment();
             bundle.putString("name", "Assets");
@@ -317,8 +354,49 @@ public class AssetViewEdit extends Fragment {
 
                     protected void onPostExecute(Long result) {
                         update_roma_request.add("attribute", new JsonParser().parse(utils.attribute_request.toString()));
-                        System.out.println("UPDATE ROMA: " + romaOps.current_roma_clusters);
-                        romaOps.update_roma(getActivity(), add_cluster_request, update_roma_request, assets, homme);
+
+                        Client.getService(getActivity()).account_cluster_create(add_cluster_request).enqueue(new Callback<ClusterResponse>() {
+                            @Override
+                            public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
+                                if (response.body()!=null && response.body().getSuccess().equals("true")) {
+                                    for (Clusters cl: response.body().getClusters()) { romaOps.existing_clusters.add(cl); romaOps.current_roma_clusters.add(cl.getId()); }
+
+                                    update_roma_request.add("cluster", new JsonParser().parse(romaOps.current_roma_clusters.toString()));
+
+                                    Client.getService(getActivity()).update_roma(update_roma_request).enqueue(new Callback<SimpleResponse>() {
+                                        @Override
+                                        public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
+                                            if(response.body()!=null && response.body().getSuccess().equals("true")) {
+                                                homme.fragmentHandler.transition(new AssetFragment(), "ASSETS");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<SimpleResponse> call, Throwable t) {
+                                            System.out.println("onFailure");
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ClusterResponse> call, Throwable t) {
+                                update_roma_request.add("cluster", new JsonParser().parse(romaOps.current_roma_clusters.toString()));
+                                Client.getService(getActivity()).update_roma(update_roma_request).enqueue(new Callback<SimpleResponse>() {
+                                    @Override
+                                    public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
+                                        if(response.body()!=null && response.body().getSuccess().equals("true")) {
+                                            homme.fragmentHandler.transition(new AssetFragment(), "ASSETS");
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<SimpleResponse> call, Throwable t) {
+                                        System.out.println("onFailure");
+                                    }
+                                });
+                            }
+                        });
                     }
                 }
 

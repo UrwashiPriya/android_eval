@@ -4,6 +4,7 @@ package com.neuman.brutus.retrofit;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
+import com.neuman.brutus.Home;
 import com.neuman.brutus.utils.Globals;
 
 import java.io.IOException;

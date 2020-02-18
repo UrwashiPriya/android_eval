@@ -43,7 +43,7 @@ public class RomaOps {
                         nxt.setArguments(bundle);
 
                         fragmentManager.beginTransaction().hide(cur).show(nxt).commit();
-                        homme.cur = nxt;
+//                        homme.cur = nxt;
                     }
                 }
 

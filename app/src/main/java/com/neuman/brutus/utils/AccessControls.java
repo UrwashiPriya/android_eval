@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.google.gson.JsonObject;
+import com.neuman.brutus.Home;
 import com.neuman.brutus.retrofit.Client;
 import com.neuman.brutus.retrofit.models.SimpleResponse;
 
@@ -17,7 +18,6 @@ import retrofit2.Response;
 public class AccessControls {
 
     public Context context;
-    public Globals g = new Globals();
     public Boolean ret = false;
 
     public AccessControls(Context context) {

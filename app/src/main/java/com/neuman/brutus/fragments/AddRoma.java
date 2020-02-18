@@ -29,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.JsonArray;
@@ -41,6 +42,7 @@ import com.neuman.brutus.Home;
 import com.neuman.brutus.R;
 import com.neuman.brutus.adapters.ArrayAdapter;
 import com.neuman.brutus.retrofit.Client;
+import com.neuman.brutus.retrofit.models.AttributeReponse;
 import com.neuman.brutus.retrofit.models.Attributes;
 import com.neuman.brutus.retrofit.models.ClusterResponse;
 import com.neuman.brutus.retrofit.models.Clusters;
@@ -86,7 +88,7 @@ public class AddRoma extends Fragment {
     private int current_attribute;
     private String last_captured_image_path;
     private View current_view;
-    private Globals utils = new Globals();
+    private Globals utils;
     private String[] galleryPermissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
 
     @Nullable
@@ -94,14 +96,57 @@ public class AddRoma extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.add_roma, container, false);
         romaOps = new RomaOps(getActivity());
+        utils = new Globals();
+
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        LinearLayout add_roma_layout = view.findViewById(R.id.add_roma_layout);
 
+        JsonObject fetch_params = new JsonObject();
+        fetch_params.addProperty("account", "1");
+        fetch_params.addProperty("roma_module_id", "1");
+        fetch_params.addProperty("offset", "0");
+        fetch_params.addProperty("limit", "100");
+
+        JsonObject tag_params = new JsonObject();
+        tag_params.addProperty("offset", "0");
+        tag_params.addProperty("limit", "100");
+        tag_params.addProperty("account", "1");
+
+        Client.getService(getActivity()).fetch_roma_mod_attrs(fetch_params).enqueue(new retrofit2.Callback<AttributeReponse>() {
+            @Override
+            public void onResponse(Call<AttributeReponse> call, Response<AttributeReponse> response) {
+                if (response.body() != null && response.body().getSuccess().contains("true")) {
+
+                    utils.roma_attributes = response.body().getAttributes();
+
+                    Client.getService(getActivity()).account_cluster_fetch(tag_params).enqueue(new retrofit2.Callback<ClusterResponse>() {
+
+                        @Override
+                        public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
+                            romaOps.existing_clusters = response.body().getClusters();
+                            make_view(view);
+                        }
+
+                        @Override
+                        public void onFailure(Call<ClusterResponse> call, Throwable t) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AttributeReponse> call, Throwable t) {
+            }
+        });
+    }
+
+    private void make_view(View view) {
+        LinearLayout add_roma_layout = view.findViewById(R.id.add_roma_layout);
         ImageButton add = view.findViewById(R.id.add_button_roma);
         add.setOnClickListener(v -> onClickOnCreateRoma(v));
 
@@ -209,7 +254,6 @@ public class AddRoma extends Fragment {
             }
         }
     }
-
     private class GlobalTextWatcher implements TextWatcher {
 
         TextInputEditText textInputEditText;

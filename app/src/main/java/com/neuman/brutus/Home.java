@@ -21,10 +21,10 @@ import java.util.HashMap;
 
 public class Home extends AppCompatActivity implements View.OnClickListener{
 
-    public FragmentHandler fragManager;
+    public FragmentHandler fragmentHandler;
     public FragmentManager fr_man = getSupportFragmentManager();
-    ProgressBar spinner = null;
-    Globals g = new Globals();
+    Globals g;
+    ImageView imageView;
 
 
     @Override
@@ -32,20 +32,43 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
 
-        fragManager = new FragmentHandler(g.fragments, fr_man,this, this, g);
-        fr_man.beginTransaction().show(g.fr_home).commit();
-        g.cur = g.fr_home;
+        g = new Globals();
+        g.addFragments(getSupportFragmentManager());
 
-        ImageView iv = findViewById(R.id.menu_nav_1);
-        iv.setOnClickListener(this);
-        getSupportFragmentManager().beginTransaction().add(R.id.frag_container, g.fr_home, "home").commit();
+        imageView = findViewById(R.id.menu_nav_1);
+        imageView.setTag("HOME");
+        imageView.setOnClickListener(this);
+
+        imageView = findViewById(R.id.menu_nav_2);
+        imageView.setTag("ASSETS");
+        imageView.setOnClickListener(this);
+
+        imageView = findViewById(R.id.menu_nav_3);
+        imageView.setTag("TICKETS");
+        imageView.setOnClickListener(this);
+
+        imageView = findViewById(R.id.menu_nav_4);
+        imageView.setTag("ORGANISATION");
+        imageView.setOnClickListener(this);
+
+        imageView = findViewById(R.id.menu_nav_5);
+        imageView.setTag("SPARES");
+        imageView.setOnClickListener(this);
+
+        imageView = findViewById(R.id.fab_btn);
+        imageView.setTag("MORE");
+        imageView.setOnClickListener(this);
+
+        fragmentHandler = new FragmentHandler(fr_man, g);
+        getSupportFragmentManager().beginTransaction().show(g.fragments.get("HOME")).commit();
+        g.cur = "HOME";
     }
 
     @Override
     public void onClick(View v) {
         String next = v.getTag().toString();
-        if (next!=g.cur && next!=null) {
-            fragManager.transition(g.cur, next, spinner);
+        if (!next.equals(g.cur)) {
+            fragmentHandler.transition(next);
             g.cur = next;
         }
     }
