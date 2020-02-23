@@ -3,21 +3,12 @@ package com.neuman.brutus;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.neuman.brutus.fragments.AssetFragment;
-import com.neuman.brutus.fragments.HomeFragment;
-import com.neuman.brutus.fragments.OrgFragment;
-import com.neuman.brutus.fragments.SupplyFragment;
-import com.neuman.brutus.fragments.TicketFragment;
+import com.neuman.brutus.utils.FragmentHandler;
 import com.neuman.brutus.utils.Globals;
-
-import java.util.HashMap;
 
 public class Home extends AppCompatActivity implements View.OnClickListener{
 
@@ -68,8 +59,15 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
     public void onClick(View v) {
         String next = v.getTag().toString();
         if (!next.equals(g.cur)) {
-            fragmentHandler.transition(next);
+            fragmentHandler.transition(next, null);
             g.cur = next;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(fragmentHandler.prev != null) {
+            fragmentHandler.transition(fragmentHandler.prev, null);
         }
     }
 }

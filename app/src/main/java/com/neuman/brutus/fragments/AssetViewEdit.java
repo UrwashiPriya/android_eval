@@ -115,7 +115,7 @@ public class AssetViewEdit extends Fragment {
     @Override
     public Object getEnterTransition() {
 
-        try { roma = (Roma) getArguments().getSerializable("asset"); } catch (NullPointerException n) { Log.d("NPE", n.getMessage()); }
+        try { roma = (Roma) getArguments().getSerializable("asset"); roma.getClustersAsList(); } catch (NullPointerException n) { Log.d("NPE", n.getMessage()); }
 
         JsonObject tag_params = new JsonObject();
         tag_params.addProperty("offset", "0");
@@ -123,11 +123,10 @@ public class AssetViewEdit extends Fragment {
         tag_params.addProperty("account", "1");
 
         Client.getService(getActivity()).account_cluster_fetch(tag_params).enqueue(new retrofit2.Callback<ClusterResponse>() {
-
             @Override
             public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
                 romaOps.existing_clusters = response.body().getClusters();
-                make_view(getView());
+                make_asset_view(getView());
             }
 
             @Override
@@ -137,13 +136,12 @@ public class AssetViewEdit extends Fragment {
         return super.getEnterTransition();
     }
 
-    private void make_view(View view) {
-
+    private void make_asset_view(View view) {
         if (roma != null && !roma.toString().equals("false")) {
             asset_layout = view.findViewById(R.id.asset_layout);
             ((ImageButton) view.findViewById(R.id.enable_edit_button_roma)).setOnClickListener(vee->edit_roma(vee, view));
             ((ImageButton) view.findViewById(R.id.apply_edit_button_roma)).setOnClickListener(vee->edit_roma(vee, view));
-            ((ImageButton) view.findViewById(R.id.bt_close)).setOnClickListener(vee->homme.fragmentHandler.transition("ASSETS"));
+            ((ImageButton) view.findViewById(R.id.bt_close)).setOnClickListener(vee->homme.fragmentHandler.transition("ASSETS", null));
 
             ((TextView) view.findViewById(R.id.view_code)).setText(roma.getCode());
 
@@ -367,7 +365,7 @@ public class AssetViewEdit extends Fragment {
                                         @Override
                                         public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
                                             if(response.body()!=null && response.body().getSuccess().equals("true")) {
-                                                homme.fragmentHandler.transition(new AssetFragment(), "ASSETS");
+                                                homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
                                             }
                                         }
 
@@ -386,7 +384,7 @@ public class AssetViewEdit extends Fragment {
                                     @Override
                                     public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
                                         if(response.body()!=null && response.body().getSuccess().equals("true")) {
-                                            homme.fragmentHandler.transition(new AssetFragment(), "ASSETS");
+                                            homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
                                         }
                                     }
 

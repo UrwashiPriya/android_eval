@@ -18,6 +18,7 @@ import com.google.gson.JsonParser;
 import com.neuman.brutus.Home;
 import com.neuman.brutus.R;
 import com.neuman.brutus.adapters.AssetListAdapter;
+import com.neuman.brutus.offline.mode.OffSyncRomaOps;
 import com.neuman.brutus.retrofit.Client;
 import com.neuman.brutus.retrofit.models.RomaFilters;
 import com.neuman.brutus.retrofit.models.RomaResponse;
@@ -33,6 +34,7 @@ public class AssetFragment extends Fragment {
     ListView listView;
     ListAdapter listAdapter;
     RomaResponse romaResponse;
+    OffSyncRomaOps offSyncRomaOps = new OffSyncRomaOps();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -40,31 +42,24 @@ public class AssetFragment extends Fragment {
         View view_ = inflater.inflate(R.layout.fragment_assets, container, false);
         listView = view_.findViewById(R.id.asset_list);
 
-        ArrayList<RomaFilters> filters = new ArrayList<>();
-        JsonObject fetch_params = new JsonObject();
-        fetch_params.addProperty("account", "1");
-        fetch_params.addProperty("roma_module_id", "1");
-        fetch_params.add("filters", new JsonParser().parse(filters.toString()));
-        fetch_params.addProperty("offset", "0");
-        fetch_params.addProperty("limit", "10");
+        Home homme = (Home) getActivity();
+        Button btn = view_.findViewById(R.id.add_button);
+        btn.setOnClickListener(v -> {
+            homme.fragmentHandler.transition("ADDROMA", "ASSETS");
+        });
 
-        Client.getService(getActivity()).roma_fetch(fetch_params).enqueue(new retrofit2.Callback<RomaResponse>(){
+        offSyncRomaOps.offsync_fetch_roma(new ArrayList<>(), "1", "0", "10", getActivity(), new retrofit2.Callback<RomaResponse>(){
             @Override
             public void onResponse(Call<RomaResponse> call, Response<RomaResponse> response) {
                 if (response.body() != null && response.body().getSuccess().contains("true")) {
                     romaResponse = response.body();
-                    getEnterTransition();
+                    offSyncRomaOps.writeto_offsync(romaResponse);
+                    createListAdapter();
                 }
             }
 
             @Override
             public void onFailure(Call<RomaResponse> call, Throwable t) { }
-        });
-
-        Home homme = (Home) getActivity();
-        Button btn = view_.findViewById(R.id.add_button);
-        btn.setOnClickListener(v -> {
-            homme.fragmentHandler.transition("ADDROMA");
         });
 
         return view_;
@@ -74,6 +69,11 @@ public class AssetFragment extends Fragment {
     @Override
     public Object getEnterTransition() {
 
+        createListAdapter();
+        return super.getEnterTransition();
+    }
+
+    void createListAdapter() {
         if (romaResponse!=null && !romaResponse.getRoma().toString().equals("false") && !romaResponse.getRoma().isEmpty()) {
 
             listAdapter = new AssetListAdapter(getActivity(), romaResponse.getCodeList(), romaResponse.getEqTypeList(), romaResponse.getImageList());
@@ -87,10 +87,8 @@ public class AssetFragment extends Fragment {
                 Fragment fragment = new AssetViewEdit();
                 fragment.setArguments(bundle);
 
-                homme.fragmentHandler.transition(fragment, "VIEWASSET");
+                homme.fragmentHandler.transition(fragment, "VIEWASSET", "ASSETS");
             });
         }
-
-        return super.getEnterTransition();
     }
 }
