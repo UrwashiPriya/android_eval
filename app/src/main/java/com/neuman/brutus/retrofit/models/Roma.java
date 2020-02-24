@@ -65,21 +65,20 @@ public class Roma implements Serializable {
 
     public String getAttribute(String attribute) {
 
-        Iterator<Attributes> i = attributes.iterator();
-
-        while (i.hasNext()) {
-            Attributes nxt = i.next(); if(nxt.getName().equals(attribute)) { return nxt.getAttr_data_value()==null? nxt.getRaw_data() : nxt.getAttr_data_value(); }
+        for (Attributes nxt : attributes) {
+            if (nxt.getName().equals(attribute)) {
+                return nxt.getAttr_data_value() == null ? nxt.getRaw_data() : nxt.getAttr_data_value();
+            }
         }
         return "";
     }
 
-    public List<String> getClustersAsList() {
+    public List<String> fetchClustersAsList() {
         List<String> cluster_val = new ArrayList<>();
 
-        for (Clusters clu: clusters) {
+        for (Clusters clu : clusters) {
             cluster_val.add(clu.getCluster());
         }
-
         return cluster_val;
     }
 

@@ -1,4 +1,4 @@
-package com.neuman.brutus.sqlite;
+package com.neuman.brutus.storage;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
-
-import com.google.gson.JsonObject;
 
 public class OffSyncDbHandler extends SQLiteOpenHelper {
     public OffSyncDbHandler(@Nullable Context context, int version) {

@@ -115,7 +115,7 @@ public class AssetViewEdit extends Fragment {
     @Override
     public Object getEnterTransition() {
 
-        try { roma = (Roma) getArguments().getSerializable("asset"); roma.getClustersAsList(); } catch (NullPointerException n) { Log.d("NPE", n.getMessage()); }
+        try { roma = (Roma) getArguments().getSerializable("asset"); } catch (NullPointerException n) { Log.d("NPE", n.getMessage()); }
 
         JsonObject tag_params = new JsonObject();
         tag_params.addProperty("offset", "0");
@@ -156,7 +156,7 @@ public class AssetViewEdit extends Fragment {
             v = getLayoutInflater().inflate(R.layout.widget_chips, null);
             nachoTextView = v.findViewById(R.id.chip_edtext);
             nachoTextView.setAdapter(adapter);
-            nachoTextView.setText(roma.getClustersAsList());
+            nachoTextView.setText(roma.fetchClustersAsList());
             nachoTextView.setThreshold(1);
             nachoTextView.enableEditChipOnTouch(false, true);
             nachoTextView.addChipTerminator('\n', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL);

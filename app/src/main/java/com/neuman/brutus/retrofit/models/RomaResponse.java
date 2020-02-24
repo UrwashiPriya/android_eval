@@ -29,19 +29,20 @@ public class RomaResponse implements Serializable {
 
     public ArrayList<String> getCodeList() {
 
-        ArrayList<String> codes = new ArrayList<>(); Iterator<Roma> i = roma.iterator();
+        ArrayList<String> codes = new ArrayList<>();
 
-        while(i.hasNext()) { codes.add(i.next().getCode()); }
+        for (Roma value : roma) {
+            codes.add(value.getCode());
+        }
 
         return codes;
     }
 
     public ArrayList<String> getEqTypeList() {
         ArrayList<String> types = new ArrayList<>();
-        Iterator<Roma> i = roma.iterator();
 
-        while(i.hasNext()) {
-            types.add(i.next().getAttribute("Equipment Type"));
+        for (Roma value : roma) {
+            types.add(value.getAttribute("Equipment Type"));
         }
 
         return types;

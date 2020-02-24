@@ -3,20 +3,15 @@ package com.neuman.brutus.offline.mode;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 import com.google.gson.JsonParser;
-import com.neuman.brutus.Home;
 import com.neuman.brutus.retrofit.Client;
 import com.neuman.brutus.retrofit.models.RomaFilters;
 import com.neuman.brutus.retrofit.models.RomaResponse;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -41,14 +36,11 @@ public class OffSyncRomaOps {
         }
     }
 
-    public void writeto_offsync(RomaResponse romaResponse, Integer max_stored) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String romaResp = mapper.writeValueAsString(romaResponse);
-            System.out.println("blahblahsheep "+romaResp);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public RomaResponse writeto_offsync(RomaResponse romaResponse, String request, String header, String type, Integer exec_later, Integer encryption, Integer max_stored) {
+        Gson gson = new Gson();
+        String json = gson.toJson(romaResponse);
+        RomaResponse resp = gson.fromJson(json, RomaResponse.class);
+        return resp;
     }
 
     public void readfrom_offsync(JsonObject fetch_params) {
