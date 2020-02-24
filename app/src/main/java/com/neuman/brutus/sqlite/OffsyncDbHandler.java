@@ -33,7 +33,7 @@ public class OffSyncDbHandler extends SQLiteOpenHelper {
 
     }
 
-    public void pushOffsyncRequest(String request, String response, String headers, String type) {
+    public void pushOffsyncRequest(String request, String response, String headers, String type, Integer exec_later, Integer encryption) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -41,6 +41,8 @@ public class OffSyncDbHandler extends SQLiteOpenHelper {
         contentValues.put("response", response);
         contentValues.put("header", headers);
         contentValues.put("type", type);
+        contentValues.put("exec_later", exec_later);
+        contentValues.put("encryption", encryption);
 
         sqLiteDatabase.insert("OffSync", null, contentValues);
         sqLiteDatabase.close();

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.neuman.brutus.Home;
@@ -15,6 +16,7 @@ import com.neuman.brutus.retrofit.Client;
 import com.neuman.brutus.retrofit.models.RomaFilters;
 import com.neuman.brutus.retrofit.models.RomaResponse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -39,12 +41,17 @@ public class OffSyncRomaOps {
         }
     }
 
-    public void writeto_offsync(RomaResponse romaResponse) {
-
+    public void writeto_offsync(RomaResponse romaResponse, Integer max_stored) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String romaResp = mapper.writeValueAsString(romaResponse);
+            System.out.println("blahblahsheep "+romaResp);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void readfrom_offsync(JsonObject fetch_params) {
-        System.out.println(fetch_params.toString());
     }
 
     private boolean isNetworkAvailable(Context context) {

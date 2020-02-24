@@ -53,7 +53,7 @@ public class AssetFragment extends Fragment {
             public void onResponse(Call<RomaResponse> call, Response<RomaResponse> response) {
                 if (response.body() != null && response.body().getSuccess().contains("true")) {
                     romaResponse = response.body();
-                    offSyncRomaOps.writeto_offsync(romaResponse);
+                    offSyncRomaOps.writeto_offsync(romaResponse, 1);
                     createListAdapter();
                 }
             }
