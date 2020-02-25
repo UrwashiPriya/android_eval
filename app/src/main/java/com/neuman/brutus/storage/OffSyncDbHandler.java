@@ -2,19 +2,22 @@ package com.neuman.brutus.storage;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
 public class OffSyncDbHandler extends SQLiteOpenHelper {
+    private String table = "OffSync";
+
     public OffSyncDbHandler(@Nullable Context context, int version) {
         super(context, "OffSync", null, version);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        String CREATE_TABLE = "CREATE TABLE OffSync (" +
+        String CREATE_TABLE = "CREATE TABLE "+table+" (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "request TEXT, " +
                 "response TEXT, " +
@@ -46,7 +49,15 @@ public class OffSyncDbHandler extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
-    public void pullOffsyncRequest() {
-
+    public String readOffsyncRequest(String request) {
+        String response = null;
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM "+table+" WHERE request='"+request+"'", null);
+        while (cursor.moveToNext()) {
+            response = cursor.getString(cursor.getColumnIndex("response"));
+            System.out.println("BEHOLD, THE RESPONSE... "+response);
+        }
+        cursor.close();
+        return response;
     }
 }

@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
             username = user_input.getText().toString();
             password = pass_input.getText().toString();
 
-            access.validate_user(username, password, g.save_creds, getApplicationContext(), intent, dialog);
+            access.validate_user(username, password, g.save_creds, getApplicationContext(), intent);
         });
     }
 
@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         if (prefs.getString("username", null) != null && prefs.getString("password", null) != null) {
-            access.validate_user(prefs.getString("username", null),  prefs.getString("password", null), g.save_creds, getApplicationContext(), intent, dialog);
+            access.validate_user(prefs.getString("username", null),  prefs.getString("password", null), g.save_creds, getApplicationContext(), intent);
         }
     }
 }

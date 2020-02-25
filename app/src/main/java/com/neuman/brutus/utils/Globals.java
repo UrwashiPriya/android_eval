@@ -26,7 +26,7 @@ import java.util.Map;
 public class Globals {
 
     public String PREF_COOKIES = "PREF_COOKIES";
-    public String API_BASE = "http://heyneuman.com:3000/";
+    public String API_BASE = "https://dash.heyneuman.com:3000/";
     public Boolean save_creds = true;
     public ArrayList<Attributes> roma_attributes;
     public JsonArray attribute_request = new JsonArray();
