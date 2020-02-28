@@ -17,7 +17,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
     Globals g;
     ImageView imageView;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

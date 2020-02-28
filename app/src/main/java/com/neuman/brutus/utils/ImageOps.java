@@ -4,12 +4,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.neuman.brutus.offline.mode.AccountOpsOffSync;
 import com.neuman.brutus.retrofit.Client;
 import com.neuman.brutus.retrofit.models.UploadResponse;
 
@@ -22,40 +24,59 @@ import okhttp3.RequestBody;
 
 public class ImageOps {
 
-    public JsonArray upload_images(Context context, JsonArray image_attributes, JsonArray attribute_list) {
-        for (int i=0; i<image_attributes.size(); i++) {
+//    public JsonArray upload_images(Context context, JsonArray image_attributes, JsonArray attribute_list) {
+//        for (int i=0; i<image_attributes.size(); i++) {
+//
+//            File file = new File(image_attributes.get(i).getAsJsonObject().get("value").getAsString());
+//            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+//            MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+//
+//            try {
+//                UploadResponse response = Client.getService(context).upload_file(body, "1").execute().body();
+//                image_attributes.get(i).getAsJsonObject().addProperty("value", response.getFile());
+//
+//                for (JsonElement jsonElement: attribute_list) {
+//                    if (jsonElement.getAsJsonObject().get("id").equals(image_attributes.get(i).getAsJsonObject().get("id"))) {
+//                        attribute_list.remove(jsonElement);
+//                    }
+//                }
+//
+//                attribute_list.add(image_attributes.get(i));
+//                image_attributes.remove(i);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return attribute_list;
+//    }
 
-            File file = new File(image_attributes.get(i).getAsJsonObject().get("value").getAsString());
-            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+    public JsonArray upload_files_as_attributes(JsonArray file_attributes, JsonArray attribute_list, String code, Context context) {
+        if (isNetworkAvailable(context)) {
+            for (int i=0; i<file_attributes.size(); i++) {
+                File file = new File(file_attributes.get(i).getAsJsonObject().get("value").getAsString());
+                String attr_id = file_attributes.get(i).getAsJsonObject().get("id").getAsString();
+                RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+                try {
+                    UploadResponse response = Client.getService(context).upload_file_as_attribute(body, "1", code, attr_id).execute().body();
+                    file_attributes.get(i).getAsJsonObject().addProperty("value", response.getFile());
 
-            try {
-                UploadResponse response = Client.getService(context).upload_file(body, "1").execute().body();
-                image_attributes.get(i).getAsJsonObject().addProperty("value", response.getFile());
-
-                for (JsonElement jsonElement: attribute_list) {
-                    if (jsonElement.getAsJsonObject().get("id").equals(image_attributes.get(i).getAsJsonObject().get("id"))) {
-                        attribute_list.remove(jsonElement);
+                    // In case image is being replaced
+                    for (JsonElement jsonElement : attribute_list) {
+                        if (jsonElement.getAsJsonObject().get("id").equals(file_attributes.get(i).getAsJsonObject().get("id"))) {
+                            attribute_list.remove(jsonElement);
+                        }
                     }
+
+                    attribute_list.add(file_attributes.get(i));
+                    file_attributes.remove(i);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-                attribute_list.add(image_attributes.get(i));
-                image_attributes.remove(i);
-
-//                .enqueue(new Callback<UploadResponse>() {
-//                    @Override
-//                    public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
-//                        image_attributes.get(j).getAsJsonObject().addProperty("value", response.body().getFile());
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<UploadResponse> call, Throwable t) {
-//
-//                    }
-//                });
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } else {
+            AccountOpsOffSync accountOpsOffSync = new AccountOpsOffSync();
+            accountOpsOffSync.writeRequestOffSync(file_attributes.toString(), "file_upload_requests", context);
         }
         return attribute_list;
     }
@@ -96,4 +117,9 @@ public class ImageOps {
             return null;
     }
 
+    private boolean isNetworkAvailable(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
 }

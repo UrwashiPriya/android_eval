@@ -34,30 +34,42 @@ public class OffSyncDbHandler extends SQLiteOpenHelper {
 
     }
 
-    public void pushOffsyncRequest(String request, String response, String headers, String type, Integer exec_later, Integer encryption) {
+    public void pushOffSyncRequest(String request, String response, String headers, String type, Integer exec_later, Integer encryption, Integer max_reqs) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
 
-        contentValues.put("request", request);
-        contentValues.put("response", response);
-        contentValues.put("header", headers);
-        contentValues.put("type", type);
-        contentValues.put("exec_later", exec_later);
-        contentValues.put("encryption", encryption);
+        if (max_reqs==null || (getOffSyncReqCount(request)<max_reqs)) {
+            ContentValues contentValues = new ContentValues();
 
-        sqLiteDatabase.insert("OffSync", null, contentValues);
-        sqLiteDatabase.close();
+            contentValues.put("request", request);
+            contentValues.put("response", response);
+            contentValues.put("header", headers);
+            contentValues.put("type", type);
+            contentValues.put("exec_later", exec_later);
+            contentValues.put("encryption", encryption);
+
+            sqLiteDatabase.insert("OffSync", null, contentValues);
+        } else {
+            sqLiteDatabase.rawQuery("UPDATE "+table+" SET response='"+response+"' WHERE request='"+request+"' AND id IN (SELECT MIN(id) FROM " + table + " WHERE request='"+request+"')", null);
+        }
     }
 
-    public String readOffsyncRequest(String request) {
+    public String readOffSyncRequest(String request) {
         String response = null;
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM "+table+" WHERE request='"+request+"'", null);
         while (cursor.moveToNext()) {
             response = cursor.getString(cursor.getColumnIndex("response"));
-            System.out.println("BEHOLD, THE RESPONSE... "+response);
         }
         cursor.close();
         return response;
+    }
+
+    private Integer getOffSyncReqCount(String request) {
+        Integer count = 0;
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM "+table+" WHERE request='"+request+"'", null);
+        while (cursor.moveToNext()) { count++; }
+        cursor.close();
+        return count;
     }
 }

@@ -9,6 +9,8 @@ import com.google.gson.JsonObject;
 
 import com.google.gson.JsonParser;
 import com.neuman.brutus.retrofit.Client;
+import com.neuman.brutus.retrofit.models.AttributeReponse;
+import com.neuman.brutus.retrofit.models.Roma;
 import com.neuman.brutus.retrofit.models.RomaFilters;
 import com.neuman.brutus.retrofit.models.RomaResponse;
 import com.neuman.brutus.storage.OffSyncDbHandler;
@@ -19,38 +21,39 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class OffSyncRomaOps {
+public class RomaOpsOffSync {
     private JsonObject fetch_params = null;
     private OffSyncDbHandler offSyncDbHandler;
     Gson gson = new Gson();
 
-    public void offsync_fetch_roma(ArrayList<RomaFilters> filters, String roma_module_id, String offset, String limit, Context context, Callback<RomaResponse> callback) {
-
-        fetch_params = new JsonObject();
-        fetch_params.addProperty("account", "1");
-        fetch_params.addProperty("roma_module_id", roma_module_id);
-        fetch_params.add("filters", new JsonParser().parse(filters.toString()));
-        fetch_params.addProperty("offset", offset);
-        fetch_params.addProperty("limit", limit);
-
+    public RomaResponse fetchRoma(JsonObject fetch_params, Context context, Callback<RomaResponse> callback) {
         if (isNetworkAvailable(context)) {
             Client.getService(context).roma_fetch(fetch_params).enqueue(callback);
         } else {
-            readfrom_offsync(fetch_params, context);
+            return gson.fromJson(readOffSync(fetch_params, context), RomaResponse.class);
         }
+
+        return null;
     }
 
-    public void writeto_offsync(RomaResponse romaResponse, Context context, Integer max_stored) {
-        if (fetch_params != null) {
-            offSyncDbHandler = new OffSyncDbHandler(context, 1);
-            offSyncDbHandler.pushOffsyncRequest(fetch_params.toString(), gson.toJson(romaResponse), "", "roma_fetch_req", 0, 0);
-            readfrom_offsync(fetch_params, context);
+    public AttributeReponse fetchRomaModuleAttrs(JsonObject fetch_params, Context context, Callback<AttributeReponse> callback) {
+        if (isNetworkAvailable(context)) {
+            Client.getService(context).fetch_roma_mod_attrs(fetch_params).enqueue(callback);
+        } else {
+            return gson.fromJson(readOffSync(fetch_params, context), AttributeReponse.class);
         }
+
+        return null;
     }
 
-    public void readfrom_offsync(JsonObject fetch_params, Context context) {
+    public void writeResponseOffSync(String romaResponseStr, String fetch_params, String type, Context context, Integer max_stored) {
         offSyncDbHandler = new OffSyncDbHandler(context, 1);
-        offSyncDbHandler.readOffsyncRequest(fetch_params.toString());
+        offSyncDbHandler.pushOffSyncRequest(fetch_params, romaResponseStr, "", type, 0, 0, max_stored);
+    }
+
+    private String readOffSync(JsonObject fetch_params, Context context) {
+        offSyncDbHandler = new OffSyncDbHandler(context, 1);
+        return offSyncDbHandler.readOffSyncRequest(fetch_params.toString());
     }
 
     private boolean isNetworkAvailable(Context context) {

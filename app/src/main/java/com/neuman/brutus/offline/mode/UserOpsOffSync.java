@@ -18,10 +18,10 @@ import java.util.ArrayList;
 
 import retrofit2.Callback;
 
-public class OffSyncUserOps {
+public class UserOpsOffSync {
     private JsonObject fetch_params = null;
     private OffSyncDbHandler offSyncDbHandler;
-    Gson gson = new Gson();
+    private Gson gson = new Gson();
 
     public void offsync_validate_user(String username, String password, Context context, Intent intent, Callback<SimpleResponse> callback) {
 
@@ -33,23 +33,20 @@ public class OffSyncUserOps {
             Client.getService(context).user_login(fetch_params).enqueue(callback);
         } else {
             SimpleResponse response = gson.fromJson(readfrom_offsync(fetch_params, context), SimpleResponse.class);
-            System.out.println("Yee Success: "+response.getSuccess());
-            if (context != null && intent != null) {
+            if (response != null && response.getSuccess().contains("true") && intent != null) {
                 context.startActivity(intent);
             }
         }
     }
 
-    public void writeto_offsync(SimpleResponse simpleResponse, Context context, Integer max_stored) {
-        if (fetch_params != null) {
-            offSyncDbHandler = new OffSyncDbHandler(context, 1);
-            offSyncDbHandler.pushOffsyncRequest(fetch_params.toString(), gson.toJson(simpleResponse), "", "roma_fetch_req", 0, 0);
-        }
+    public void writeto_offsync(SimpleResponse simpleResponse, JsonObject fetch_params, String type, Context context, Integer max_stored) {
+        offSyncDbHandler = new OffSyncDbHandler(context, 1);
+        offSyncDbHandler.pushOffSyncRequest(fetch_params.toString(), gson.toJson(simpleResponse), "", type, 0, 1, max_stored);
     }
 
     private String readfrom_offsync(JsonObject fetch_params, Context context) {
         offSyncDbHandler = new OffSyncDbHandler(context, 1);
-        return offSyncDbHandler.readOffsyncRequest(fetch_params.toString());
+        return offSyncDbHandler.readOffSyncRequest(fetch_params.toString());
     }
 
     private boolean isNetworkAvailable(Context context) {

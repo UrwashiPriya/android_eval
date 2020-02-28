@@ -13,10 +13,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.neuman.brutus.R;
 import com.neuman.brutus.adapters.SupplyListAdapter;
+import com.neuman.brutus.offline.mode.RomaOpsOffSync;
 import com.neuman.brutus.retrofit.Client;
 import com.neuman.brutus.retrofit.models.RomaFilters;
 import com.neuman.brutus.retrofit.models.RomaResponse;
@@ -32,6 +34,8 @@ public class SupplyFragment extends Fragment {
     ListView listView;
     ListAdapter listAdapter;
     RomaResponse romaResponse;
+    Gson gson = new Gson();
+    RomaOpsOffSync romaOpsOffSync = new RomaOpsOffSync();
 
     public SupplyFragment() {
         Bundle bundle = new Bundle();
@@ -54,11 +58,12 @@ public class SupplyFragment extends Fragment {
         fetch_params.addProperty("offset", "0");
         fetch_params.addProperty("limit", "10");
 
-        Client.getService(getActivity()).roma_fetch(fetch_params).enqueue(new retrofit2.Callback<RomaResponse>(){
+        RomaResponse romaResponseOffSync = romaOpsOffSync.fetchRoma(fetch_params, getActivity(), new retrofit2.Callback<RomaResponse>(){
             @Override
             public void onResponse(Call<RomaResponse> call, Response<RomaResponse> response) {
                 if (response.body() != null && response.body().getSuccess().contains("true")) {
                     romaResponse = response.body();
+                    romaOpsOffSync.writeResponseOffSync(gson.toJson(response.body()), fetch_params.toString(),"roma_fetch_req",  getActivity(), 1);
                     getEnterTransition();
                 }
             }
@@ -66,6 +71,11 @@ public class SupplyFragment extends Fragment {
             @Override
             public void onFailure(Call<RomaResponse> call, Throwable t) { }
         });
+
+        if (romaResponseOffSync!=null && romaResponseOffSync.getSuccess().contains("true")) {
+            romaResponse = romaResponseOffSync;
+            getEnterTransition();
+        }
 
         return view;
     }

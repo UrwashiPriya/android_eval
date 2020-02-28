@@ -21,30 +21,36 @@ import retrofit2.http.Part;
 
 public interface Interface {
 
+    // Done
     @POST("people/login")
     Call<SimpleResponse> user_login(@Body JsonObject user_creds);
 
+    // Done
     @POST("roma/fetch")
     Call<RomaResponse> roma_fetch(@Body JsonObject roma_search);
 
+    // Done
     @POST("roma/attribute/fetch")
     Call<AttributeReponse> fetch_roma_mod_attrs(@Body JsonObject response);
 
+    // Done
     @POST("account/cluster/create")
     Call<ClusterResponse> account_cluster_create(@Body JsonObject response);
 
+    // Done
     @POST("account/cluster/fetch")
     Call<ClusterResponse> account_cluster_fetch(@Body JsonObject response);
 
     @POST("roma/create")
     Call<SimpleResponse> create_roma(@Body JsonObject response);
 
+    // Done
     @POST("roma/update")
     Call<SimpleResponse> update_roma(@Body JsonObject response);
 
-    @Multipart
-    @POST("upload")
-    Call<UploadResponse> upload_file(@Part MultipartBody.Part media, @Header("account") String account);
+//    @Multipart
+//    @POST("upload")
+//    Call<UploadResponse> upload_file(@Part MultipartBody.Part media, @Header("account") String account);
 
     @Multipart
     @POST("upload/roma")
