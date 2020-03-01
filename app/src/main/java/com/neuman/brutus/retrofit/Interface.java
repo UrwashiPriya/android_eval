@@ -52,6 +52,7 @@ public interface Interface {
 //    @POST("upload")
 //    Call<UploadResponse> upload_file(@Part MultipartBody.Part media, @Header("account") String account);
 
+    // Done
     @Multipart
     @POST("upload/roma")
     Call<UploadResponse> upload_file_as_attribute(@Part MultipartBody.Part media, @Header("account") String account, @Header("code") String roma_code, @Header("attr_id") String attr_id);

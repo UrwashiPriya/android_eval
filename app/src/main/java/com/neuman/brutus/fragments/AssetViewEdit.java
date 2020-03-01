@@ -95,54 +95,66 @@ public class AssetViewEdit extends Fragment {
     private RomaOps romaOps;
     private Home homme;
     private EditText editText;
-    AccountOpsOffSync accountOpsOffSync = new AccountOpsOffSync();
+    private View view = null;
+    private Boolean onActivityResult = false;
+    private AccountOpsOffSync accountOpsOffSync = new AccountOpsOffSync();
     private String[] galleryPermissions = { Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA };
 
     AssetViewEdit() {
-        romaOps = new RomaOps(getActivity());
+        romaOps = new RomaOps();
         utils  = new Globals();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.view_assets, container, false);
+        view = inflater.inflate(R.layout.view_assets, container, false);
+        return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        homme = (Home) getActivity();
+        if (!onActivityResult) {
+            homme = (Home) getActivity();
 
-        try { roma = (Roma) getArguments().getSerializable("asset"); utils.roma_attributes = roma.getAttributes(); } catch (NullPointerException n) { Log.d("NPE", n.getMessage()); }
-
-        JsonObject tag_params = new JsonObject();
-        tag_params.addProperty("offset", "0");
-        tag_params.addProperty("limit", "10");
-        tag_params.addProperty("account", "1");
-
-        ClusterResponse clusterResponse = accountOpsOffSync.fetchClustersOffSync(tag_params, getActivity(), new retrofit2.Callback<ClusterResponse>() {
-            @Override
-            public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
-                if (response.body()!=null && response.body().getSuccess().contains("true")) {
-                    romaOps.existing_clusters = response.body().getClusters();
-                    make_asset_view(getView());
-                    accountOpsOffSync.writeResponseOffSync(response.body(), tag_params, getActivity(), "subbed_clusters", 1);
-                }
+            try {
+                roma = (Roma) getArguments().getSerializable("asset");
+                utils.roma_attributes = roma.getAttributes();
+            } catch (NullPointerException n) {
+                Log.d("NPE", n.getMessage());
             }
 
-            @Override
-            public void onFailure(Call<ClusterResponse> call, Throwable t) { }
-        });
+            JsonObject tag_params = new JsonObject();
+            tag_params.addProperty("offset", "0");
+            tag_params.addProperty("limit", "10");
+            tag_params.addProperty("account", "1");
 
-        if (clusterResponse != null && clusterResponse.getSuccess().contains("true")) {
-            romaOps.existing_clusters = clusterResponse.getClusters();
-            make_asset_view(getView());
+            ClusterResponse clusterResponse = accountOpsOffSync.fetchClustersOffSync(tag_params, getActivity(), new retrofit2.Callback<ClusterResponse>() {
+                @Override
+                public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
+                    if (response.body() != null && response.body().getSuccess().contains("true")) {
+                        romaOps.existing_clusters = response.body().getClusters();
+                        makeAssetView(view);
+                        accountOpsOffSync.writeResponseOffSync(response.body(), tag_params, getActivity(), "subbed_clusters", 1);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ClusterResponse> call, Throwable t) { }
+            });
+
+            if (clusterResponse != null && clusterResponse.getSuccess().contains("true")) {
+                romaOps.existing_clusters = clusterResponse.getClusters();
+                makeAssetView(view);
+            }
         }
+
+        onActivityResult = false;
     }
 
-    private void make_asset_view(View view) {
+    private void makeAssetView(View view) {
         if (roma != null && !roma.toString().equals("false")) {
             asset_layout = view.findViewById(R.id.asset_layout);
             ((ImageButton) view.findViewById(R.id.enable_edit_button_roma)).setOnClickListener(vee->enableRomaEdit(vee, view));
@@ -276,7 +288,7 @@ public class AssetViewEdit extends Fragment {
                             ImageView imv = v.findViewById(R.id.attr_image);
                             RelativeLayout rel = v.findViewById(R.id.attr_image_rel);
 
-                            Glide.with(getActivity()).load(utils.FILE_UPLOAD_ENDPOINT+"1/"+utils.roma_attributes.get(i).getRaw_data()).error(R.drawable.placeholder).into(new SimpleTarget<GlideDrawable>() {
+                            Glide.with(getActivity()).load(utils.FILE_ACCESS_ENDPOINT+"1/"+utils.roma_attributes.get(i).getRaw_data()).error(R.drawable.placeholder).into(new SimpleTarget<GlideDrawable>() {
                                 @Override
                                 public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
                                     imv.setVisibility(View.INVISIBLE);
@@ -338,7 +350,7 @@ public class AssetViewEdit extends Fragment {
 
             class DownloadFilesTask extends AsyncTask<URL, Integer, Long> {
                 protected Long doInBackground(URL... urls) {
-                    utils.attribute_request = imageOps.upload_files_as_attributes(file_attributes, utils.attribute_request, update_roma_request.get("code").getAsString(), getActivity());
+                    imageOps.upload_files_as_attributes(file_attributes, utils.attribute_request, update_roma_request.get("code").getAsString(), getActivity());
                     return null;
                 }
 
@@ -346,52 +358,58 @@ public class AssetViewEdit extends Fragment {
 
                 protected void onPostExecute(Long result) {
                     update_roma_request.add("attribute", new JsonParser().parse(utils.attribute_request.toString()));
-                    Boolean isClusAddDone = accountOpsOffSync.createClusterOffSync(add_cluster_request, getActivity(), new Callback<ClusterResponse>() {
-                        @Override
-                        public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
-                            if (response.body() != null && response.body().getSuccess().equals("true")) {
-                                for (Clusters cl : response.body().getClusters()) {
-                                    romaOps.existing_clusters.add(cl);
-                                    romaOps.current_roma_clusters.add(cl.getId());
-                                }
+                    if (new_clusters.size()>0) {
+                        Boolean isClusAddDone = accountOpsOffSync.createClusterOffSync(add_cluster_request, getActivity(), new Callback<ClusterResponse>() {
+                            @Override
+                            public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
+                                if (response.body() != null && response.body().getSuccess().equals("true")) {
+                                    for (Clusters cl : response.body().getClusters()) {
+                                        romaOps.existing_clusters.add(cl);
+                                        romaOps.current_roma_clusters.add(cl.getId());
+                                    }
 
-                                update_roma_request.add("cluster", new JsonParser().parse(romaOps.current_roma_clusters.toString()));
-                                accountOpsOffSync.editRomaOffSync(update_roma_request, getActivity(), new Callback<SimpleResponse>() {
-                                    @Override
-                                    public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
-                                        if (response.body() != null && response.body().getSuccess().equals("true")) {
-                                            homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
+                                    update_roma_request.add("cluster", new JsonParser().parse(romaOps.current_roma_clusters.toString()));
+                                    accountOpsOffSync.editRomaOffSync(update_roma_request, getActivity(), new Callback<SimpleResponse>() {
+                                        @Override
+                                        public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
+                                            if (response.body() != null && response.body().getSuccess().equals("true")) {
+                                                homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
+                                            }
                                         }
-                                    }
 
-                                    @Override
-                                    public void onFailure(Call<SimpleResponse> call, Throwable t) { }
-                                });
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ClusterResponse> call, Throwable t) {
-                            update_roma_request.add("cluster", new JsonParser().parse(romaOps.current_roma_clusters.toString()));
-                            accountOpsOffSync.editRomaOffSync(update_roma_request, getActivity(), new Callback<SimpleResponse>() {
-                                @Override
-                                public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
-                                    if (response.body() != null && response.body().getSuccess().equals("true")) {
-                                        homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
-                                    }
+                                        @Override
+                                        public void onFailure(Call<SimpleResponse> call, Throwable t) { }
+                                    });
                                 }
+                            }
 
-                                @Override
-                                public void onFailure(Call<SimpleResponse> call, Throwable t) { }
-                            });
+                            @Override
+                            public void onFailure(Call<ClusterResponse> call, Throwable t) { }
+                        });
+
+                        if (!isClusAddDone) {
+                            // If cluster add failed due to network, store roma edit request offline
+                            update_roma_request.add("cluster", new JsonParser().parse(romaOps.current_roma_clusters.toString()));
+                            accountOpsOffSync.writeRequestOffSync(update_roma_request.toString(), "edit_roma_request", getActivity());
+                            homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
                         }
-                    });
-
-                    if (!isClusAddDone) {
-                        // If cluster add failed due to network, store roma edit request offline
+                    } else {
                         update_roma_request.add("cluster", new JsonParser().parse(romaOps.current_roma_clusters.toString()));
-                        accountOpsOffSync.writeRequestOffSync(update_roma_request.toString(), "edit_roma_request", getActivity());
-                        homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
+                        Boolean isEditDone = accountOpsOffSync.editRomaOffSync(update_roma_request, getActivity(), new Callback<SimpleResponse>() {
+                            @Override
+                            public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
+                                if (response.body() != null && response.body().getSuccess().equals("true")) {
+                                    homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<SimpleResponse> call, Throwable t) { }
+                        });
+
+                        if (!isEditDone) {
+                            homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
+                        }
                     }
                 }
             }
@@ -458,6 +476,8 @@ public class AssetViewEdit extends Fragment {
 
     public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+        onActivityResult = false;
 
         ImageView imageview = current_view.findViewById(R.id.attr_image);
         RelativeLayout imagerel = current_view.findViewById(R.id.attr_image_rel);

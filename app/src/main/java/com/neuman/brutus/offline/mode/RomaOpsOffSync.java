@@ -5,14 +5,17 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import com.google.gson.JsonParser;
+import com.neuman.brutus.fragments.AssetFragment;
 import com.neuman.brutus.retrofit.Client;
 import com.neuman.brutus.retrofit.models.AttributeReponse;
 import com.neuman.brutus.retrofit.models.Roma;
 import com.neuman.brutus.retrofit.models.RomaFilters;
 import com.neuman.brutus.retrofit.models.RomaResponse;
+import com.neuman.brutus.retrofit.models.SimpleResponse;
 import com.neuman.brutus.storage.OffSyncDbHandler;
 
 import java.util.ArrayList;
@@ -25,6 +28,14 @@ public class RomaOpsOffSync {
     private JsonObject fetch_params = null;
     private OffSyncDbHandler offSyncDbHandler;
     Gson gson = new Gson();
+
+    public void createRoma(JsonObject request, Context context, Callback<SimpleResponse> callback) {
+        if (isNetworkAvailable(context)) {
+            Client.getService(context).create_roma(request).enqueue(callback);
+        } else {
+            writeRequestOffSync(request.toString(), "create_roma_request", context);
+        }
+    }
 
     public RomaResponse fetchRoma(JsonObject fetch_params, Context context, Callback<RomaResponse> callback) {
         if (isNetworkAvailable(context)) {
@@ -44,6 +55,11 @@ public class RomaOpsOffSync {
         }
 
         return null;
+    }
+
+    private void writeRequestOffSync(String request, String type, Context context) {
+        offSyncDbHandler = new OffSyncDbHandler(context, 1);
+        offSyncDbHandler.pushOffSyncRequest(request, "", "", type, 1, 0, null);
     }
 
     public void writeResponseOffSync(String romaResponseStr, String fetch_params, String type, Context context, Integer max_stored) {

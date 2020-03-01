@@ -19,6 +19,7 @@ import com.neuman.brutus.Home;
 import com.neuman.brutus.R;
 import com.neuman.brutus.fragments.AssetFragment;
 import com.neuman.brutus.offline.mode.AccountOpsOffSync;
+import com.neuman.brutus.offline.mode.RomaOpsOffSync;
 import com.neuman.brutus.retrofit.Client;
 import com.neuman.brutus.retrofit.models.AttributeReponse;
 import com.neuman.brutus.retrofit.models.ClusterResponse;
@@ -43,13 +44,12 @@ import retrofit2.Response;
 
 public class RomaOps {
 
-    private Context context;
-    private Bundle bundle;
     public ArrayList<Clusters> existing_clusters;
     public ArrayList<Integer> current_roma_clusters = new ArrayList<>();
     private AccountOpsOffSync accountOpsOffSync = new AccountOpsOffSync();
+    private RomaOpsOffSync romaOpsOffSync = new RomaOpsOffSync();
 
-    public RomaOps(Context context) { this.context = context; }
+    public RomaOps() { }
 
 //    public void view_roma(String account, String roma_module_id, String offset, String limit, Fragment cur, Fragment nxt, FragmentManager fragmentManager, Home homme) {
 //
@@ -162,55 +162,58 @@ public class RomaOps {
 //        });
 //    }
 
-    public void create_roma(Context context, JsonObject add_cluster_request, JsonObject add_roma_request, Fragment assets, Home homme) {
+    public void create_roma(Context context, JsonObject add_cluster_request, JsonObject add_roma_request, Home homme) {
 
-        Boolean isClusAddDone = accountOpsOffSync.createClusterOffSync(add_cluster_request, context, new Callback<ClusterResponse>() {
-            @Override
-            public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
-                if (response.body() != null && response.body().getSuccess().equals("true")) {
-                    for (Clusters cl : response.body().getClusters()) {
-                        existing_clusters.add(cl);
-                        current_roma_clusters.add(cl.getId());
-                    }
+        System.out.println("I mean blahblahsheep!!");
 
-                    add_roma_request.add("cluster", new JsonParser().parse(current_roma_clusters.toString()));
-                    Client.getService(context).create_roma(add_roma_request).enqueue(new Callback<SimpleResponse>() {
-                        @Override
-                        public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
-                            if (response.body() != null && response.body().getSuccess().equals("true")) {
-                                homme.fragmentHandler.transition(new AssetFragment(), "VIEWASSETS", null);
+        if (add_cluster_request.get("cluster").getAsJsonArray().size()>0) {
+            Boolean isClusAddDone = accountOpsOffSync.createClusterOffSync(add_cluster_request, context, new Callback<ClusterResponse>() {
+                @Override
+                public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
+                    if (response.body() != null && response.body().getSuccess().equals("true")) {
+                        for (Clusters cl : response.body().getClusters()) {
+                            existing_clusters.add(cl);
+                            current_roma_clusters.add(cl.getId());
+                        }
+
+                        add_roma_request.add("cluster", new JsonParser().parse(current_roma_clusters.toString()));
+                        romaOpsOffSync.createRoma(add_roma_request, context, new Callback<SimpleResponse>() {
+                            @Override
+                            public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
+                                if (response.body() != null && response.body().getSuccess().equals("true")) {
+                                    homme.fragmentHandler.transition(new AssetFragment(), "VIEWASSETS", null);
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onFailure(Call<SimpleResponse> call, Throwable t) {
-                        }
-                    });
+                            @Override
+                            public void onFailure(Call<SimpleResponse> call, Throwable t) { }
+                        });
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<ClusterResponse> call, Throwable t) {
+                @Override
+                public void onFailure(Call<ClusterResponse> call, Throwable t) { }
+            });
+
+            if (!isClusAddDone) {
                 add_roma_request.add("cluster", new JsonParser().parse(current_roma_clusters.toString()));
-                Client.getService(context).create_roma(add_roma_request).enqueue(new Callback<SimpleResponse>() {
-                    @Override
-                    public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
-                        if (response.body() != null && response.body().getSuccess().equals("true")) {
-                            homme.fragmentHandler.transition(new AssetFragment(), "VIEWASSETS", null);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<SimpleResponse> call, Throwable t) {
-                    }
-                });
+                accountOpsOffSync.writeRequestOffSync(add_roma_request.toString(), "add_roma_request", context);
+                homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
             }
-        });
 
-        if (!isClusAddDone) {
+        } else {
             add_roma_request.add("cluster", new JsonParser().parse(current_roma_clusters.toString()));
-            accountOpsOffSync.writeRequestOffSync(add_roma_request.toString(), "add_roma_request", context);
-            homme.fragmentHandler.transition(new AssetFragment(), "ASSETS", null);
+            romaOpsOffSync.createRoma(add_roma_request, context, new Callback<SimpleResponse>() {
+                @Override
+                public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
+                    if (response.body() != null && response.body().getSuccess().equals("true")) {
+                        homme.fragmentHandler.transition(new AssetFragment(), "VIEWASSETS", null);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SimpleResponse> call, Throwable t) { }
+            });
         }
     }
 //

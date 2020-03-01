@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.neuman.brutus.R;
+import com.neuman.brutus.utils.Globals;
 
 import java.util.ArrayList;
 
@@ -23,6 +24,7 @@ public class AssetListAdapter extends BaseAdapter {
     private final ArrayList<String> values;
     private final ArrayList<String> numbers;
     private final ArrayList<String> images;
+    Globals util = new Globals();
 
     public AssetListAdapter(Context context, ArrayList<String> values, ArrayList<String> numbers, ArrayList<String> images){
         this.context = context;
@@ -73,7 +75,7 @@ public class AssetListAdapter extends BaseAdapter {
         if (images.get(position)==null) {
             Glide.with(parent.getContext()).load(R.drawable.placeholder).error(R.drawable.placeholder).into(viewHolder.icon);
         } else {
-            Glide.with(parent.getContext()).load(images.get(position)).error(R.drawable.placeholder).into(viewHolder.icon);
+            Glide.with(parent.getContext()).load(util.FILE_ACCESS_ENDPOINT+"1/"+images.get(position)).error(R.drawable.placeholder).into(viewHolder.icon);
         }
 
         return convertView;

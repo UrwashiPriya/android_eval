@@ -62,6 +62,11 @@ public class AccountOpsOffSync {
         offSyncDbHandler.pushOffSyncRequest(request, "", "", type, 1, 0, null);
     }
 
+    public void writeImageUploadRequestOffSync(String request, String code, String account, String type, Context context) {
+        offSyncDbHandler = new OffSyncDbHandler(context, 1);
+        offSyncDbHandler.pushOffSyncRequest(request, "", code, account, "", type, 1, 0, null);
+    }
+
     public void writeResponseOffSync(ClusterResponse clusterResponse, JsonObject fetch_params, Context context, String type, Integer max_stored) {
         offSyncDbHandler = new OffSyncDbHandler(context, 1);
         offSyncDbHandler.pushOffSyncRequest(fetch_params.toString(), gson.toJson(clusterResponse), "", type, 0, 0, max_stored);

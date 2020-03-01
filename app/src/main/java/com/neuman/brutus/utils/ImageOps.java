@@ -58,8 +58,8 @@ public class ImageOps {
                 RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
                 MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
                 try {
-                    UploadResponse response = Client.getService(context).upload_file_as_attribute(body, "1", code, attr_id).execute().body();
-                    file_attributes.get(i).getAsJsonObject().addProperty("value", response.getFile());
+                    Client.getService(context).upload_file_as_attribute(body, "1", code, attr_id).execute().body();
+//                    file_attributes.get(i).getAsJsonObject().addProperty("value", response.getFile());
 
                     // In case image is being replaced
                     for (JsonElement jsonElement : attribute_list) {
@@ -68,15 +68,15 @@ public class ImageOps {
                         }
                     }
 
-                    attribute_list.add(file_attributes.get(i));
-                    file_attributes.remove(i);
+//                    attribute_list.add(file_attributes.get(i));
+//                    file_attributes.remove(i);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-        } else {
+        } else if (file_attributes.size()>0) {
             AccountOpsOffSync accountOpsOffSync = new AccountOpsOffSync();
-            accountOpsOffSync.writeRequestOffSync(file_attributes.toString(), "file_upload_requests", context);
+            accountOpsOffSync.writeImageUploadRequestOffSync(file_attributes.toString(), code, "1", "file_upload_requests", context);
         }
         return attribute_list;
     }

@@ -50,10 +50,9 @@ public class RomaResponse implements Serializable {
 
     public ArrayList<String> getImageList() {
         ArrayList<String> images = new ArrayList<>();
-        Iterator<Roma> i = roma.iterator();
 
-        while(i.hasNext()) {
-            images.add("http://heyneuman.com:3000/uploads/1/"+i.next().getAttribute("Equipment Image"));
+        for (Roma value : roma) {
+            images.add(value.getAttribute("Equipment Image"));
         }
 
         return images;

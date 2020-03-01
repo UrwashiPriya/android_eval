@@ -84,7 +84,6 @@ public class AddRoma extends Fragment {
     private JsonObject add_cluster_request = new JsonObject();
     private NachoTextView nachoTextView;
     private RomaOps romaOps;
-    private AssetFragment assets = new AssetFragment();
     private DialogUtils dialogs = new DialogUtils();
     private ImageOps imageOps = new ImageOps();
     private File image = null;
@@ -93,6 +92,7 @@ public class AddRoma extends Fragment {
     private View current_view;
     private Globals utils;
     private Gson gson = new Gson();
+    private Boolean onActivityResult = false;
     private AccountOpsOffSync accountOpsOffSync = new AccountOpsOffSync();
     private RomaOpsOffSync romaOpsOffSync = new RomaOpsOffSync();
     private String[] galleryPermissions = { Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA };
@@ -101,11 +101,9 @@ public class AddRoma extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.add_roma, container, false);
-        romaOps = new RomaOps(getActivity());
+        romaOps = new RomaOps();
         utils = new Globals();
-
         ((ImageButton) view.findViewById(R.id.bt_close)).setOnClickListener(v -> getActivity().onBackPressed());
-
         return view;
     }
 
@@ -113,71 +111,77 @@ public class AddRoma extends Fragment {
     public void onStart() {
         super.onStart();
 
-        JsonObject fetch_params = new JsonObject();
-        fetch_params.addProperty("account", "1");
-        fetch_params.addProperty("roma_module_id", "1");
-        fetch_params.addProperty("offset", "0");
-        fetch_params.addProperty("limit", "100");
+        if (!onActivityResult) {
+            JsonObject fetch_params = new JsonObject();
+            fetch_params.addProperty("account", "1");
+            fetch_params.addProperty("roma_module_id", "1");
+            fetch_params.addProperty("offset", "0");
+            fetch_params.addProperty("limit", "100");
 
-        JsonObject tag_params = new JsonObject();
-        tag_params.addProperty("offset", "0");
-        tag_params.addProperty("limit", "100");
-        tag_params.addProperty("account", "1");
+            JsonObject tag_params = new JsonObject();
+            tag_params.addProperty("offset", "0");
+            tag_params.addProperty("limit", "100");
+            tag_params.addProperty("account", "1");
 
-        AttributeReponse attributeReponse = romaOpsOffSync.fetchRomaModuleAttrs(fetch_params, getActivity(), new retrofit2.Callback<AttributeReponse>() {
-            @Override
-            public void onResponse(Call<AttributeReponse> call, Response<AttributeReponse> response) {
-                if (response.body() != null && response.body().getSuccess().contains("true")) {
+            AttributeReponse attributeReponse = romaOpsOffSync.fetchRomaModuleAttrs(fetch_params, getActivity(), new retrofit2.Callback<AttributeReponse>() {
+                @Override
+                public void onResponse(Call<AttributeReponse> call, Response<AttributeReponse> response) {
+                    if (response.body() != null && response.body().getSuccess().contains("true")) {
 
-                    utils.roma_attributes = response.body().getAttributes();
-                    romaOpsOffSync.writeResponseOffSync(gson.toJson(response.body()), fetch_params.toString(), "fetch_module_attrs", getActivity(), 1);
+                        utils.roma_attributes = response.body().getAttributes();
+                        romaOpsOffSync.writeResponseOffSync(gson.toJson(response.body()), fetch_params.toString(), "fetch_module_attrs", getActivity(), 1);
 
-                    ClusterResponse clusterResponse = accountOpsOffSync.fetchClustersOffSync(tag_params, getActivity(), new retrofit2.Callback<ClusterResponse>() {
-                        @Override
-                        public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
-                            if (response.body().getSuccess().contains("true")) {
-                                romaOps.existing_clusters = response.body().getClusters();
-                                make_view(getView());
-                                accountOpsOffSync.writeResponseOffSync(response.body(), tag_params, getActivity(), "subbed_clusters", 1);
+                        ClusterResponse clusterResponse = accountOpsOffSync.fetchClustersOffSync(tag_params, getActivity(), new retrofit2.Callback<ClusterResponse>() {
+                            @Override
+                            public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
+                                if (response.body().getSuccess().contains("true")) {
+                                    romaOps.existing_clusters = response.body().getClusters();
+                                    make_view(getView());
+                                    accountOpsOffSync.writeResponseOffSync(response.body(), tag_params, getActivity(), "subbed_clusters", 1);
+                                }
                             }
+
+                            @Override
+                            public void onFailure(Call<ClusterResponse> call, Throwable t) {
+                            }
+                        });
+
+                        if (clusterResponse != null && clusterResponse.getSuccess().contains("true")) {
+                            romaOps.existing_clusters = clusterResponse.getClusters();
+                            make_view(getView());
                         }
-
-                        @Override
-                        public void onFailure(Call<ClusterResponse> call, Throwable t) { }
-                    });
-
-                    if (clusterResponse != null && clusterResponse.getSuccess().contains("true")) {
-                        romaOps.existing_clusters = clusterResponse.getClusters();
-                        make_view(getView());
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<AttributeReponse> call, Throwable t) { }
-        });
-
-        if (attributeReponse != null && attributeReponse.getSuccess().contains("true")) {
-            utils.roma_attributes = attributeReponse.getAttributes();
-            ClusterResponse clusterResponse = accountOpsOffSync.fetchClustersOffSync(tag_params, getActivity(), new retrofit2.Callback<ClusterResponse>() {
-                @Override
-                public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
-                    if (response.body()!=null && response.body().getSuccess().contains("true")) {
-                        romaOps.existing_clusters = response.body().getClusters();
-                        make_view(getView());
-                        accountOpsOffSync.writeResponseOffSync(response.body(), tag_params, getActivity(), "subbed_clusters", 1);
                     }
                 }
 
                 @Override
-                public void onFailure(Call<ClusterResponse> call, Throwable t) { }
+                public void onFailure(Call<AttributeReponse> call, Throwable t) { }
             });
 
-            if (clusterResponse != null && clusterResponse.getSuccess().contains("true")) {
-                romaOps.existing_clusters = clusterResponse.getClusters();
-                make_view(getView());
+            if (attributeReponse != null && attributeReponse.getSuccess().contains("true")) {
+                utils.roma_attributes = attributeReponse.getAttributes();
+                ClusterResponse clusterResponse = accountOpsOffSync.fetchClustersOffSync(tag_params, getActivity(), new retrofit2.Callback<ClusterResponse>() {
+                    @Override
+                    public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
+                        if (response.body() != null && response.body().getSuccess().contains("true")) {
+                            romaOps.existing_clusters = response.body().getClusters();
+                            make_view(getView());
+                            accountOpsOffSync.writeResponseOffSync(response.body(), tag_params, getActivity(), "subbed_clusters", 1);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ClusterResponse> call, Throwable t) {
+                    }
+                });
+
+                if (clusterResponse != null && clusterResponse.getSuccess().contains("true")) {
+                    romaOps.existing_clusters = clusterResponse.getClusters();
+                    make_view(getView());
+                }
             }
         }
+
+        onActivityResult = false;
     }
 
     private void make_view(View view) {
@@ -289,6 +293,7 @@ public class AddRoma extends Fragment {
             }
         }
     }
+
     private class GlobalTextWatcher implements TextWatcher {
 
         TextInputEditText textInputEditText;
@@ -381,6 +386,8 @@ public class AddRoma extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
+        onActivityResult = true;
+
         ImageView imageview = current_view.findViewById(R.id.attr_image);
         RelativeLayout imagerel = current_view.findViewById(R.id.attr_image_rel);
 
@@ -438,7 +445,9 @@ public class AddRoma extends Fragment {
         }
     }
 
-    void onClickOnCreateRoma(View v) {
+    private void onClickOnCreateRoma(View v) {
+
+        System.out.println(nachoTextView.getAllChips().size()>0);
 
         if (v.getId() == R.id.add_button_roma) {
             JsonArray new_clusters = new JsonArray();
@@ -462,24 +471,19 @@ public class AddRoma extends Fragment {
             add_roma_request.addProperty("roma_module_id", "1");
             add_roma_request.addProperty("account", "1");
 
-            Home homme = (Home) getActivity();
-            Bundle bundle = new Bundle();
-            bundle.putString("name", "Assets");
-            assets.setArguments(bundle);
-
             if (add_roma_request.get("code")!=null && add_roma_request.get("code").getAsString().length() != 0 && nachoTextView.getAllChips().size()>0) {
 
                 class DownloadFilesTask extends AsyncTask<URL, Integer, Long> {
                     protected Long doInBackground(URL... urls) {
-                        utils.attribute_request = imageOps.upload_files_as_attributes(file_attributes, utils.attribute_request, add_cluster_request.get("code").getAsString(), getActivity());
+                        add_roma_request.add("attribute", new JsonParser().parse(utils.attribute_request.toString()));
+                        romaOps.create_roma(getActivity(), add_cluster_request, add_roma_request, (Home) getActivity());
                         return null;
                     }
 
                     protected void onProgressUpdate(Integer... progress) { }
 
                     protected void onPostExecute(Long result) {
-                        add_roma_request.add("attribute", new JsonParser().parse(utils.attribute_request.toString()));
-                        romaOps.create_roma(getActivity(), add_cluster_request, add_roma_request, assets, homme);
+                        imageOps.upload_files_as_attributes(file_attributes, utils.attribute_request, add_roma_request.get("code").getAsString(), getActivity());
                     }
                 }
 
