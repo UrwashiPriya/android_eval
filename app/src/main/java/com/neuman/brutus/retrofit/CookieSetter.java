@@ -36,4 +36,15 @@ public class CookieSetter implements Interceptor {
 
         return chain.proceed(builder.build());
     }
+
+    public String getAuthCookie() {
+
+        HashSet<String> preferences = (HashSet<String>) PreferenceManager.getDefaultSharedPreferences(context).getStringSet(g.PREF_COOKIES, new HashSet<String>());
+
+        for (String cookie : preferences) {
+            return cookie;
+        }
+
+        return null;
+    }
 }

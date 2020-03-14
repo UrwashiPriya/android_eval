@@ -2,6 +2,9 @@ package com.neuman.brutus.utils;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -19,6 +22,7 @@ import com.neuman.brutus.fragments.SupplyFragment;
 import com.neuman.brutus.fragments.TicketFragment;
 import com.neuman.brutus.retrofit.models.Attributes;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,5 +69,6 @@ public class Globals {
         progressDialog.setCancelable(cancelable);
         return progressDialog;
     }
+
 }
 

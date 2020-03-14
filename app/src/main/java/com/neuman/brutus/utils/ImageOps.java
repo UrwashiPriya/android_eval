@@ -117,6 +117,25 @@ public class ImageOps {
             return null;
     }
 
+    public String getPath(Uri uri, Context context) {
+
+        String path;
+        String[] projection = { MediaStore.Files.FileColumns.DATA };
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+
+        if(cursor == null) {
+            path = uri.getPath();
+        } else {
+            int column_index = cursor.getColumnIndexOrThrow(projection[0]);
+            cursor.moveToFirst();
+            path = cursor.getString(column_index);
+            System.out.println("<><><><><<><><><><>"+path+cursor.getColumnName(0)+cursor.getType(0));
+            cursor.close();
+        }
+
+        return path;
+    }
+
     private boolean isNetworkAvailable(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();

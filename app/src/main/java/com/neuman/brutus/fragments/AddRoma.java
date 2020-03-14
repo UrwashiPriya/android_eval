@@ -63,6 +63,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import id.zelory.compressor.Compressor;
@@ -91,6 +92,7 @@ public class AddRoma extends Fragment {
     private String last_captured_image_path;
     private View current_view;
     private Globals utils;
+    private View view;
     private Gson gson = new Gson();
     private Boolean onActivityResult = false;
     private AccountOpsOffSync accountOpsOffSync = new AccountOpsOffSync();
@@ -100,12 +102,13 @@ public class AddRoma extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.add_roma, container, false);
+        view = inflater.inflate(R.layout.add_roma, container, false);
         romaOps = new RomaOps();
         utils = new Globals();
         ((ImageButton) view.findViewById(R.id.bt_close)).setOnClickListener(v -> getActivity().onBackPressed());
         return view;
     }
+
 
     @Override
     public void onStart() {
@@ -136,19 +139,18 @@ public class AddRoma extends Fragment {
                             public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
                                 if (response.body().getSuccess().contains("true")) {
                                     romaOps.existing_clusters = response.body().getClusters();
-                                    make_view(getView());
+                                    make_view(view);
                                     accountOpsOffSync.writeResponseOffSync(response.body(), tag_params, getActivity(), "subbed_clusters", 1);
                                 }
                             }
 
                             @Override
-                            public void onFailure(Call<ClusterResponse> call, Throwable t) {
-                            }
+                            public void onFailure(Call<ClusterResponse> call, Throwable t) { }
                         });
 
                         if (clusterResponse != null && clusterResponse.getSuccess().contains("true")) {
                             romaOps.existing_clusters = clusterResponse.getClusters();
-                            make_view(getView());
+                            make_view(view);
                         }
                     }
                 }
@@ -164,25 +166,25 @@ public class AddRoma extends Fragment {
                     public void onResponse(Call<ClusterResponse> call, Response<ClusterResponse> response) {
                         if (response.body() != null && response.body().getSuccess().contains("true")) {
                             romaOps.existing_clusters = response.body().getClusters();
-                            make_view(getView());
+                            make_view(view);
                             accountOpsOffSync.writeResponseOffSync(response.body(), tag_params, getActivity(), "subbed_clusters", 1);
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<ClusterResponse> call, Throwable t) {
-                    }
+                    public void onFailure(Call<ClusterResponse> call, Throwable t) { }
                 });
 
                 if (clusterResponse != null && clusterResponse.getSuccess().contains("true")) {
                     romaOps.existing_clusters = clusterResponse.getClusters();
-                    make_view(getView());
+                    make_view(view);
                 }
             }
         }
 
         onActivityResult = false;
     }
+
 
     private void make_view(View view) {
         LinearLayout add_roma_layout = view.findViewById(R.id.add_roma_layout);
@@ -257,7 +259,7 @@ public class AddRoma extends Fragment {
                         v1 = getLayoutInflater().inflate(R.layout.widget_dropdown, null);
                         editText = v1.findViewById(R.id.dropdown_lay);
                         editText.setText(utils.roma_attributes.get(i).getName());
-                        editText.setOnClickListener(v->dialogs.dialogDatePickerLight(v, getResources(), getActivity().getFragmentManager()));
+                        editText.setOnClickListener(v->dialogs.dialogDatePickerLight(v, getResources(), getActivity().getFragmentManager(), null));
                         editText.setTag(utils.roma_attributes.get(i).getId().toString());
                         editText.addTextChangedListener(new EditTextWatcher(editText, i, "boolean", utils));
                         add_roma_layout.addView(v1);
@@ -293,6 +295,7 @@ public class AddRoma extends Fragment {
             }
         }
     }
+
 
     private class GlobalTextWatcher implements TextWatcher {
 
@@ -383,6 +386,7 @@ public class AddRoma extends Fragment {
         builder.show();
     }
 
+
     public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
@@ -445,9 +449,8 @@ public class AddRoma extends Fragment {
         }
     }
 
-    private void onClickOnCreateRoma(View v) {
 
-        System.out.println(nachoTextView.getAllChips().size()>0);
+    private void onClickOnCreateRoma(View v) {
 
         if (v.getId() == R.id.add_button_roma) {
             JsonArray new_clusters = new JsonArray();

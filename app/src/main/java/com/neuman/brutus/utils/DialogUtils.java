@@ -20,10 +20,12 @@ import java.util.Date;
 
 public class DialogUtils {
 
+    public String boolTitleDialog = "";
+
     public void showBoolDialog(final View v, Context context) {
         final String[] array = new String[] { "True", "False" };
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Country");
+        builder.setTitle(boolTitleDialog);
         builder.setSingleChoiceItems(array, -1, (dialogInterface, i) -> {
             ((EditText) v).setText(array[i]);
             dialogInterface.dismiss();
@@ -42,25 +44,40 @@ public class DialogUtils {
         builder.show();
     }
 
-    public void dialogDatePickerLight(final View v, Resources resources, FragmentManager fragmentManager) {
+    public void dialogDatePickerLight(final View v, Resources resources, FragmentManager fragmentManager, String val) {
+
         Calendar cur_calender = Calendar.getInstance();
+
+        try {
+            if (val != null) {
+                cur_calender.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(val));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
         DatePickerDialog datePicker = DatePickerDialog.newInstance(
-                (view, year, monthOfYear, dayOfMonth) -> {
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(Calendar.YEAR, year);
-                    calendar.set(Calendar.MONTH, monthOfYear);
-                    calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                    long date = calendar.getTimeInMillis();
-                    SimpleDateFormat newFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    ((EditText) v).setText(newFormat.format(new Date(date)));
-                },
-                cur_calender.get(Calendar.YEAR),
-                cur_calender.get(Calendar.MONTH),
-                cur_calender.get(Calendar.DAY_OF_MONTH)
+            (view, year, monthOfYear, dayOfMonth) -> {
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, monthOfYear);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                long date = calendar.getTimeInMillis();
+
+                SimpleDateFormat newFormat = new SimpleDateFormat("yyyy-MM-dd");
+                ((EditText) v).setText(newFormat.format(new Date(date)));
+
+            },
+            cur_calender.get(Calendar.YEAR),
+            cur_calender.get(Calendar.MONTH),
+            cur_calender.get(Calendar.DAY_OF_MONTH)
         );
         datePicker.setThemeDark(false);
         datePicker.setAccentColor(resources.getColor(R.color.colorPrimary));
         datePicker.show(fragmentManager, "Pick a Date");
+
     }
 
     public View makeTextView(String text, LayoutInflater lay) {

@@ -19,7 +19,7 @@ public class CookieGetter implements Interceptor {
     private Globals g;
     private Context context;
 
-    public CookieGetter(Context context) {
+    CookieGetter(Context context) {
         this.context = context;
         g = new Globals();
     }

@@ -44,7 +44,7 @@ public class AssetFragment extends Fragment {
         Home homme = (Home) getActivity();
         Button btn = view_.findViewById(R.id.add_button);
         btn.setOnClickListener(v -> {
-            homme.fragmentHandler.transition("ADDROMA", "ASSETS");
+            homme.fragmentHandler.transition(new AddRoma(), "ADDROMA", "ASSETS");
         });
 
         ArrayList<RomaFilters> filters = new ArrayList<>();

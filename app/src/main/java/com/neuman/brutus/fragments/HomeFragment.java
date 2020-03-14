@@ -13,6 +13,8 @@ import com.neuman.brutus.R;
 
 public class HomeFragment extends Fragment {
 
+    private View view;
+
     public HomeFragment() {
         Bundle bundle = new Bundle();
         bundle.putString("name", "Home");
@@ -21,8 +23,14 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        view = inflater.inflate(R.layout.fragment_home, container, false);
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+
     }
 }

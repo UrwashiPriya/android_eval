@@ -9,11 +9,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -59,7 +63,9 @@ import com.neuman.brutus.utils.TextInputEditTextWatcher;
 import com.wdullaer.materialdatetimepicker.Utils;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,6 +78,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
+import static com.android.volley.VolleyLog.TAG;
 
 
 public class AssetViewEdit extends Fragment {
@@ -218,6 +225,7 @@ public class AssetViewEdit extends Fragment {
                             v.setTag("attr_label"+utils.roma_attributes.get(i).getId().toString());
                             v.setVisibility(visibility);
                             asset_layout.addView(v);
+                            dialogs.boolTitleDialog = utils.roma_attributes.get(i).getPlaceholder();
 
                             v = getLayoutInflater().inflate(R.layout.widget_dropdown, null);
                             editText = v.findViewById(R.id.dropdown_lay);
@@ -226,6 +234,8 @@ public class AssetViewEdit extends Fragment {
                             editText.setOnClickListener(vee -> dialogs.showBoolDialog(vee, getActivity()));
                             editText.setTag(utils.roma_attributes.get(i).getId().toString());
                             editText.addTextChangedListener(new EditTextWatcher(editText, i, "boolean", utils));
+
+                            ((Button) v.findViewById(R.id.clear_btn)).setOnClickListener(vee -> ((EditText)((View)vee.getParent()).findViewById(R.id.dropdown_lay)).setText(""));
 
                             v.setEnabled(false);
                             v.setVisibility(visibility);
@@ -243,7 +253,7 @@ public class AssetViewEdit extends Fragment {
                             editText = v.findViewById(R.id.dropdown_lay);
                             editText.setHint(utils.roma_attributes.get(i).getName());
                             editText.setText(utils.roma_attributes.get(i).getRaw_data());
-                            editText.setOnClickListener(vee->dialogs.dialogDatePickerLight(vee, getResources(), getActivity().getFragmentManager()));
+                            editText.setOnClickListener(vee->dialogs.dialogDatePickerLight(vee, getResources(), getActivity().getFragmentManager(), utils.roma_attributes.get(j).getRaw_data()));
                             editText.setTag(utils.roma_attributes.get(i).getId().toString());
                             editText.addTextChangedListener(new EditTextWatcher(editText, i, "date", utils));
 
@@ -266,6 +276,8 @@ public class AssetViewEdit extends Fragment {
                             editText.setTag(utils.roma_attributes.get(i).getId().toString());
                             editText.setText(utils.roma_attributes.get(i).getAttr_data_value());
                             editText.addTextChangedListener(new EditTextWatcher(editText, i, "enum", utils));
+
+                            ((Button) v.findViewById(R.id.clear_btn)).setOnClickListener(vee -> ((EditText)((View)vee.getParent()).findViewById(R.id.dropdown_lay)).setText(""));
 
                             v.setEnabled(false);
                             v.setVisibility(visibility);
@@ -421,12 +433,6 @@ public class AssetViewEdit extends Fragment {
 
 
 
-
-
-
-
-
-
     private void makePickerDialog(int j, View v) {
         current_attribute = j;
         current_view = v;
@@ -447,14 +453,18 @@ public class AssetViewEdit extends Fragment {
 
                 Intent pick = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
+                Intent filepicker = new Intent(Intent.ACTION_GET_CONTENT);
+                filepicker.setType("*/*");
+                filepicker.addCategory(Intent.CATEGORY_OPENABLE);
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Capture an Image (or) Pick from Gallery?");
                 builder.setPositiveButton("Capture", (dialogInterface, i) -> {
-                    if (v.findViewById(R.id.attr_image_rel).getTag()!=null && v.findViewById(R.id.attr_image_rel).getTag().toString().equals("image_set")) {
-                        startActivityForResult(capture, 0);
-                    } else {
-                        startActivityForResult(capture, 0);
-                    }
+//                    if (v.findViewById(R.id.attr_image_rel).getTag()!=null && v.findViewById(R.id.attr_image_rel).getTag().toString().equals("image_set")) {
+                        startActivityForResult(capture, 1);
+//                    } else {
+//                        startActivityForResult(filepicker, 0);
+//                    }
                 });
                 builder.setNegativeButton("Gallery", (dialogInterface, i) -> {
                     if (v.findViewById(R.id.attr_image_rel).getTag()!=null && v.findViewById(R.id.attr_image_rel).getTag().toString().equals("image_set")) {
@@ -477,7 +487,7 @@ public class AssetViewEdit extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
-        onActivityResult = false;
+        onActivityResult = true;
 
         ImageView imageview = current_view.findViewById(R.id.attr_image);
         RelativeLayout imagerel = current_view.findViewById(R.id.attr_image_rel);
@@ -485,6 +495,8 @@ public class AssetViewEdit extends Fragment {
         Bitmap image_bitmap;
         File file, file_output = null;
         boolean flag = true;
+
+        System.out.println("File Path: " + requestCode);
 
         switch(requestCode) {
             case 0:
@@ -511,6 +523,31 @@ public class AssetViewEdit extends Fragment {
                     file_output = new File(selectedImagePath);
                 }
                 break;
+//            case 2:
+//                if (resultCode == RESULT_OK) {
+//                    Uri uri = imageReturnedIntent.getData();
+////                    String src = uri.getPath();
+////
+////                    System.out.println("File Path: " + src);
+////                    System.out.println("File Pathz: " + imageOps.getPath(imageReturnedIntent.getData(), getActivity()));
+////
+////                    try {
+////                        ParcelFileDescriptor mInputPFD = getActivity().getContentResolver().openFileDescriptor(uri, "r");
+////                        FileDescriptor fd = mInputPFD.getFileDescriptor();
+////                    } catch (Exception e) {
+////                        e.printStackTrace();
+////                    }
+//
+////                    String path = null;
+////                    try {
+////                        path = utils.getPath(getActivity(), uri);
+////                    } catch (URISyntaxException e) {
+////                        e.printStackTrace();
+////                    }
+//                    file_output = new File(String.valueOf(uri));
+//                    System.out.println("File Path: " + file_output.getAbsolutePath());
+//                    System.out.println("File Patho: " + file_output.getName());
+//                }
         }
 
         try {

@@ -35,94 +35,17 @@
                 android:padding="@dimen/spacing_large">
 
                 <RelativeLayout
-                    android:layout_width="40dp"
-                    android:layout_height="40dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:tint="@color/orange_400"
-                        app:srcCompat="@drawable/shape_circle" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_centerInParent="true"
-                        android:tint="@android:color/white"
-                        app:srcCompat="@drawable/ic_person" />
-
-                </RelativeLayout>
-
-                <View
-                    android:layout_width="@dimen/spacing_middle"
-                    android:layout_height="0dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_width="80dp"
+                    android:layout_height="80dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="92776"
-                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="24"
+                        android:autoSizeTextType="uniform"
+                        android:gravity="center"
                         android:textColor="@color/grey_60"
                         android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Viewer"
-                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/grey_40" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <View
-            android:layout_width="@dimen/spacing_middle"
-            android:layout_height="0dp" />
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_xsmall"
-            android:layout_marginLeft="@dimen/spacing_xsmall"
-            android:layout_marginRight="@dimen/spacing_xsmall"
-            android:layout_marginTop="@dimen/spacing_xsmall"
-            android:layout_weight="1"
-            android:visibility="visible"
-            app:cardCornerRadius="2dp"
-            app:cardElevation="2dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="@dimen/spacing_large">
-
-                <RelativeLayout
-                    android:layout_width="40dp"
-                    android:layout_height="40dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:tint="@color/indigo_400"
-                        app:srcCompat="@drawable/shape_circle" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_centerInParent="true"
-                        android:tint="@android:color/white"
-                        app:srcCompat="@drawable/ic_file_download" />
 
                 </RelativeLayout>
 
@@ -133,23 +56,18 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_gravity="bottom">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:text="52791"
-                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
+                        android:layout_marginBottom="10dp"
+                        android:text="Tickets Open"
+                        android:textSize="18dp"
                         android:textColor="@color/grey_60"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Downloads"
-                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/grey_40" />
+                        android:textStyle="normal" />
 
                 </LinearLayout>
 

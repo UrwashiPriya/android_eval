@@ -12,7 +12,7 @@ public class OffSyncDbHandler extends SQLiteOpenHelper {
     private String table = "OffSync";
 
     public OffSyncDbHandler(@Nullable Context context, int version) {
-        super(context, "OffSync", null, 3);
+        super(context, "OffSync", null, version);
     }
 
     @Override

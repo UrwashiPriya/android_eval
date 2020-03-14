@@ -25,16 +25,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RomaOpsOffSync {
-    private JsonObject fetch_params = null;
     private OffSyncDbHandler offSyncDbHandler;
-    Gson gson = new Gson();
+    private Gson gson = new Gson();
 
-    public void createRoma(JsonObject request, Context context, Callback<SimpleResponse> callback) {
+    public boolean createRoma(JsonObject request, Context context, Callback<SimpleResponse> callback) {
         if (isNetworkAvailable(context)) {
             Client.getService(context).create_roma(request).enqueue(callback);
+            return false;
         } else {
             writeRequestOffSync(request.toString(), "create_roma_request", context);
         }
+
+        return true;
     }
 
     public RomaResponse fetchRoma(JsonObject fetch_params, Context context, Callback<RomaResponse> callback) {

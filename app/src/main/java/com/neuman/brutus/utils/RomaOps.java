@@ -203,7 +203,7 @@ public class RomaOps {
 
         } else {
             add_roma_request.add("cluster", new JsonParser().parse(current_roma_clusters.toString()));
-            romaOpsOffSync.createRoma(add_roma_request, context, new Callback<SimpleResponse>() {
+            Boolean isRomaOffline = romaOpsOffSync.createRoma(add_roma_request, context, new Callback<SimpleResponse>() {
                 @Override
                 public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
                     if (response.body() != null && response.body().getSuccess().equals("true")) {
@@ -214,6 +214,10 @@ public class RomaOps {
                 @Override
                 public void onFailure(Call<SimpleResponse> call, Throwable t) { }
             });
+
+            if (isRomaOffline) {
+                homme.fragmentHandler.transition(new AssetFragment(), "VIEWASSETS", null);
+            }
         }
     }
 //
